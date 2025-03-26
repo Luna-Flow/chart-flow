@@ -1,0 +1,16 @@
+{
+  "name": "Luna-Flow/chart-flow",
+  "version": "0.0.1-alpha-1",
+  "deps": {
+    "moonbitlang/x": "0.4.23"
+  },
+  "readme": "README.md",
+  "repository": "",
+  "license": "Apache-2.0",
+  "keywords": [
+    "chart",
+    "IR"
+  ],
+  "description": "Chart IR generator for Luna Flow",
+  "source": "src"
+}
