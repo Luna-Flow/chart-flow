@@ -1,25 +1,28 @@
 //Generic Props
-enum Color{
+///|
+pub(all) enum Color {
   RGB(UInt, UInt, UInt)
-  RGBA(UInt, UInt, UInt, UInt)
   ColorDimension(Array[UInt])
 }
 
 //Font Props
-enum FontStyle{
+///|
+pub(all) enum FontStyle {
   Normal
   Italic
   Bold
 }
 
-enum LinePosition{
+///|
+pub(all) enum LinePosition {
   Under
   Over
   Through
 }
 
 //Marker Props
-enum Symbol{
+///|
+pub(all) enum Symbol {
   Circle
   Square
   Diamond
@@ -28,16 +31,15 @@ enum Symbol{
   Octagon
   Star
   Bowtie
-
   Open
-
   X
   Cross
   Dot
 }
 
 //Line Props
-enum Dash{
+///|
+pub(all) enum Dash {
   Solid
   Dash
   Dot
@@ -46,8 +48,10 @@ enum Dash{
   LongDashDot
 }
 
-enum Shape{
+///|
+pub(all) enum Shape {
   Linear
+  Spline
   HV
   VH
   HVH
@@ -55,31 +59,78 @@ enum Shape{
 }
 
 //Basic Components
-struct Marker{
-  symbol: Symbol
-  size: UInt
-  color: Color
-  color_scale: (Color, Color) //(lowest, highest)
-  opacity: Float
+///|
+pub(all) struct Marker {
+  symbol : Symbol
+  size : UInt
+  color : Color
+  color_scale : (Color, Color) //(lowest, highest)
+  opacity : Float
 }
 
-struct Line{
-  width: UInt
-  dash: Dash
-  shape: Shape
-  color: Color
-  opacity: Float
+///|
+pub(all) struct Line {
+  width : UInt
+  dash : Dash
+  shape : Shape
+  smoothing : Float //[0, 1.3]
+  color : Color
+  opacity : Float
 }
-struct Font{
-  line_pos: LinePosition
-  family: String
-  size: UInt
-  color: Color
+
+///|
+pub(all) struct Font {
+  line_pos : LinePosition
+  family : String
+  size : UInt
+  color : Color
+}
+
+///|
+pub(all) struct Title {
+  font : Font
+  text : String
 }
 
 //Layout Props
-struct Layout{
-
-}
+///|
+pub(all) struct Layout {}
 
 //Trace Props
+///|
+pub(all) enum ScatterTraceMode {
+  Markers
+  Lines
+  MarkersLines
+}
+
+///|
+pub(all) enum TextPosition {
+  TL
+  TC
+  TR
+  ML
+  MC
+  MR
+  BL
+  BC
+  BR
+}
+
+///|
+pub(all) struct TraceScatter2D[U, V, N] {
+  name : String
+  mode : ScatterTraceMode
+  x : Array[U]
+  y : Array[V]
+  text : Array[String]
+  dx : N
+  dy : N
+  text_font : Font
+  marker : Marker
+  line : Line
+}
+
+//Chart Props
+///|
+pub(all) struct Chart {}
