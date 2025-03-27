@@ -2,6 +2,7 @@
 ///|
 pub(all) enum Color {
   RGB(UInt, UInt, UInt)
+  Hex(String) //"#XXXXXX"
   ColorDimension(Array[UInt])
 }
 
@@ -94,11 +95,16 @@ pub(all) struct Title {
 
 //Layout Props
 ///|
-pub(all) struct Layout {}
+pub(all) struct LayoutScatter {
+  title : Title
+  width : UInt
+  height : UInt
+  bg_color : Color
+}
 
 //Trace Props
 ///|
-pub(all) enum ScatterTraceMode {
+pub(all) enum TraceModeScatter {
   Markers
   Lines
   MarkersLines
@@ -120,7 +126,7 @@ pub(all) enum TextPosition {
 ///|
 pub(all) struct TraceScatter2D[U, V, N] {
   name : String
-  mode : ScatterTraceMode
+  mode : TraceModeScatter
   x : Array[U]
   y : Array[V]
   text : Array[String]
