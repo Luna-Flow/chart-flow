@@ -16,6 +16,7 @@ pub(all) enum FontStyle {
 
 ///|
 pub(all) enum LinePosition {
+  None
   Under
   Over
   Through
@@ -47,6 +48,7 @@ pub(all) enum Dash {
   DashDot
   LongDash
   LongDashDot
+  DashLen(UInt)
 }
 
 ///|
@@ -62,7 +64,7 @@ pub(all) enum Shape {
 //Basic Components
 ///|
 pub(all) struct Marker {
-  symbol : Symbol
+  symbol : Array[Symbol]
   size : UInt
   color : Color
   color_scale : (Color, Color) //(lowest, highest)
