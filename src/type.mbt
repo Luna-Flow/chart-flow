@@ -11,7 +11,7 @@ pub(all) enum Color {
 pub(all) enum FontStyle {
   Normal
   Italic
-  Bold
+  Bold(Int)
 }
 
 ///|
@@ -36,7 +36,6 @@ pub(all) enum Symbol {
   Open
   X
   Cross
-  Dot
 }
 
 //Line Props
@@ -63,6 +62,7 @@ pub(all) enum Shape {
 
 //Basic Components
 ///|
+/// add option paras later
 pub(all) struct Marker {
   symbol : Array[Symbol]
   size : UInt
@@ -83,10 +83,12 @@ pub(all) struct Line {
 
 ///|
 pub(all) struct Font {
-  line_pos : LinePosition
+  line_pos : Array[LinePosition]
   family : String
   size : UInt
   color : Color
+  style : FontStyle
+  weight : FontStyle
 }
 
 ///|
