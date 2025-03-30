@@ -62,33 +62,32 @@ pub(all) enum Shape {
 
 //Basic Components
 ///|
-/// add option paras later
 pub(all) struct Marker {
-  symbol : Array[Symbol]
-  size : UInt
-  color : Color
-  color_scale : (Color, Color) //(lowest, highest)
-  opacity : Float
+  symbol : Array[Symbol]?
+  size : UInt?
+  color : Color?
+  color_scale : (Color, Color)? //(lowest, highest)
+  opacity : Float?
 }
 
 ///|
 pub(all) struct Line {
-  width : UInt
-  dash : Dash
-  shape : Shape
-  smoothing : Float //[0, 1.3]
-  color : Color
-  opacity : Float
+  width : UInt?
+  dash : Dash?
+  shape : Shape?
+  smoothing : Float? //[0, 1.3]
+  color : Color?
+  opacity : Float?
 }
 
 ///|
 pub(all) struct Font {
-  line_pos : Array[LinePosition]
-  family : String
-  size : UInt
-  color : Color
-  style : FontStyle
-  weight : FontStyle
+  line_pos : Array[LinePosition]?
+  family : String?
+  size : UInt?
+  color : Color?
+  style : FontStyle?
+  weight : FontStyle?
 }
 
 ///|

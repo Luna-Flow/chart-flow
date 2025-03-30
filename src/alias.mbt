@@ -1,2 +1,2 @@
 ///|
-fnalias @lu.same_to
+fnalias @lu.(same_to, clamp)

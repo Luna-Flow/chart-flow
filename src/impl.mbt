@@ -134,25 +134,60 @@ impl Compose for Symbol with is_valid(arr) {
 ///|
 impl ToJson for Marker with to_json(s) {
   let obj : Map[String, Json] = Map::new()
-    ..set("size", s.size.to_json())
-    ..set("color", s.color.to_json())
-    ..set("opacity", s.opacity.to_json())
-  if Compose::is_valid(s.symbol) {
-    obj.set("symbol", s.symbol.to_json())
-  } else {
-    abort("Invalid symbol component.")
+  if s.size is Some(_) {
+    obj.set("size", s.size.unwrap().to_json())
   }
-  if s.color is ColorDimension(_) {
-    let color_min = s.color_scale.0.to_json()
-    let color_max = s.color_scale.1.to_json()
-    match color_min {
-      String(_) =>
-        match color_max {
-          String(_) => obj.set("color_scale", Array([color_min, color_max]))
-          _ => abort("color scale max must be a color code")
-        }
-      _ => abort("color scale min must be a color code")
+  if s.color is Some(_) {
+    obj.set("color", s.color.unwrap().to_json())
+    if s.color is Some(ColorDimension(_)) {
+      let color_min = s.color_scale.unwrap().0.to_json()
+      let color_max = s.color_scale.unwrap().1.to_json()
+      match color_min {
+        String(_) =>
+          match color_max {
+            String(_) => obj.set("color_scale", Array([color_min, color_max]))
+            _ => abort("color scale max must be a color code")
+          }
+        _ => abort("color scale min must be a color code")
+      }
     }
+  }
+  if s.opacity is Some(_) {
+    obj.set("opacity", s.opacity.unwrap().to_json())
+  }
+  if s.symbol is Some(_) {
+    if Compose::is_valid(s.symbol.unwrap()) {
+      obj.set("symbol", s.symbol.unwrap().to_json())
+    } else {
+      abort("Invalid symbol component.")
+    }
+  }
+  Object(obj)
+}
+
+///|
+impl ToJson for Line with to_json(s) {
+  let obj : Map[String, Json] = Map::new()
+  if s.width is Some(_) {
+    obj.set("width", s.width.unwrap().to_json())
+  }
+  if s.dash is Some(_) {
+    obj.set("dash", s.dash.unwrap().to_json())
+  }
+  if s.shape is Some(_) {
+    obj.set("shape", s.shape.unwrap().to_json())
+    if s.smoothing is Some(_) {
+      obj.set("smoothing", clamp(s.smoothing.unwrap(), 0, 1.3).to_json())
+    }
+  }
+  if s.color is Some(_) {
+    match s.color.unwrap() {
+      ColorDimension(_) => abort("cannot use color dimension in line")
+      _ => obj.set("color", s.color.unwrap().to_json())
+    }
+  }
+  if s.opacity is Some(_) {
+    obj.set("opacity", s.opacity.unwrap().to_json())
   }
   Object(obj)
 }
@@ -208,24 +243,39 @@ impl Compose for LinePosition with is_valid(arr) {
 ///|
 impl ToJson for Font with to_json(s) {
   let obj : Map[String, Json] = Map::new()
-    ..set("family", s.family.to_json())
-    ..set("size", s.size.to_json())
-  match s.color {
-    ColorDimension(_) => abort("cannot use color dimension in font")
-    _ => obj.set("color", s.color.to_json())
+  if s.family is Some(_) {
+    obj.set("family", s.family.unwrap().to_json())
   }
-  if Compose::is_valid(s.line_pos) {
-    obj.set("lineposition", Compose::compose(s.line_pos))
+  if s.size is Some(_) {
+    obj.set("size", s.size.unwrap().to_json())
+  }
+  if s.color is Some(_) {
+    obj.set("color", s.color.unwrap().to_json())
+    match s.color.unwrap() {
+      ColorDimension(_) => abort("cannot use color dimension in font")
+      _ => obj.set("color", s.color.unwrap().to_json())
+    }
+  }
+  if s.line_pos is Some(_) {
+    if Compose::is_valid(s.line_pos.unwrap()) {
+      obj.set("lineposition", Compose::compose(s.line_pos.unwrap()))
+    } else {
+      abort("Invalid lineposition component")
+    }
   } else {
     abort("Invalid lineposition component")
   }
-  match s.style {
-    Bold(_) => abort("Invalid style component")
-    _ => obj.set("style", s.style.to_json())
+  if s.style is Some(_) {
+    match s.style.unwrap() {
+      Bold(_) => abort("Invalid style component")
+      _ => obj.set("style", s.style.unwrap().to_json())
+    }
   }
-  match s.weight {
-    Bold(_) => obj.set("weight", s.weight.to_json())
-    _ => abort("Invalid weight component")
+  if s.weight is Some(_) {
+    match s.weight.unwrap() {
+      Bold(_) => obj.set("weight", s.weight.unwrap().to_json())
+      _ => abort("Invalid weight component")
+    }
   }
   Object(obj)
 }
