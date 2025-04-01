@@ -1,0 +1,142 @@
+package Luna-Flow/chart-flow
+
+// Values
+
+// Types and methods
+pub(all) struct ChartScatter2D[U, V, N] {
+  name : String
+  traces : Array[TraceScatter2D[U, V, N]]
+  layout : LayoutScatter?
+}
+
+pub(all) enum Color {
+  RGB(UInt, UInt, UInt)
+  Hex(String)
+  ColorDimension(Array[UInt])
+}
+
+pub(all) enum Dash {
+  Solid
+  Dash
+  Dot
+  DashDot
+  LongDash
+  LongDashDot
+  DashLen(UInt)
+}
+
+pub(all) struct Font {
+  line_pos : Array[LinePosition]?
+  family : String?
+  size : UInt?
+  color : Color?
+  style : FontStyle?
+  weight : FontStyle?
+}
+
+pub(all) enum FontStyle {
+  Normal
+  Italic
+  Bold(Int)
+}
+
+pub(all) struct LayoutScatter {
+  title : Title?
+  width : UInt?
+  height : UInt?
+  bg_color : Color?
+}
+
+pub(all) struct Line {
+  width : UInt?
+  dash : Dash?
+  shape : Shape?
+  smoothing : Float?
+  color : Color?
+  opacity : Float?
+}
+
+pub(all) enum LinePosition {
+  None
+  Under
+  Over
+  Through
+}
+
+pub(all) struct Marker {
+  symbol : Array[Symbol]?
+  size : UInt?
+  color : Color?
+  color_scale : (Color, Color)?
+  opacity : Float?
+}
+
+pub(all) enum Position {
+  Top
+  Middle
+  Bottom
+  Left
+  Center
+  Right
+}
+
+pub(all) enum Shape {
+  Linear
+  Spline
+  HV
+  VH
+  HVH
+  VHV
+}
+
+pub(all) enum Symbol {
+  Circle
+  Square
+  Diamond
+  Triangle
+  Hexagon
+  Octagon
+  Star
+  Bowtie
+  Open
+  X
+  Cross
+}
+
+pub(all) struct Title {
+  font : Font?
+  text : String
+}
+
+pub(all) enum TraceModeScatter {
+  Markers
+  Lines
+  MarkersLines
+}
+
+pub(all) struct TraceScatter2D[U, V, N] {
+  name : String
+  mode : TraceModeScatter
+  x : Array[U]
+  y : Array[V]
+  text : Array[String]?
+  dx : N?
+  dy : N?
+  text_font : Font?
+  text_position : (Position, Position)?
+  marker : Marker?
+  line : Line?
+}
+
+// Type aliases
+
+// Traits
+pub(open) trait Category {
+  get_cate(Self) -> String
+}
+
+pub(open) trait Compose {
+  compose(Array[Self]) -> Json
+  is_valid(Array[Self]) -> Bool
+}
+
