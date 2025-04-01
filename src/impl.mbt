@@ -81,12 +81,6 @@ fn compose_json(a : Json, b : Json, connector : String) -> Json {
 }
 
 ///|
-const SYM_CATE_SHAPE = "sh"
-
-///|
-const SYM_CATE_STYLE = "st"
-
-///|
 impl Category for Symbol with get_cate(s) {
   match s {
     Circle => SYM_CATE_SHAPE
@@ -191,12 +185,6 @@ impl ToJson for Line with to_json(s) {
   }
   Object(obj)
 }
-
-///|
-const LP_CATE_NONE = "n"
-
-///|
-const LP_CATE_STYLE = "s"
 
 ///|
 impl Category for LinePosition with get_cate(s) {
@@ -313,12 +301,6 @@ impl ToJson for TraceModeScatter with to_json(s) {
   }
   str.to_json()
 }
-
-///|
-const POS_CATE_VERTICAL = "v"
-
-///|
-const POS_CATE_HORIZONTAL = "h"
 
 ///|
 impl Category for Position with get_cate(s) {

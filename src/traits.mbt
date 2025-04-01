@@ -6,5 +6,5 @@ pub(open) trait Compose {
 
 ///|
 pub(open) trait Category {
-  get_cate(Self) -> String
+  get_cate(Self) -> Categories
 }

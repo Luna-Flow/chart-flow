@@ -1,8 +1,18 @@
-package Luna-Flow/chart-flow
+package "Luna-Flow/chart-flow"
 
 // Values
 
 // Types and methods
+pub(all) enum Categories {
+  SYM_CATE_SHAPE
+  SYM_CATE_STYLE
+  LP_CATE_NONE
+  LP_CATE_STYLE
+  POS_CATE_VERTICAL
+  POS_CATE_HORIZONTAL
+}
+impl Eq for Categories
+
 pub(all) struct ChartScatter2D[U, V, N] {
   name : String
   traces : Array[TraceScatter2D[U, V, N]]
@@ -132,7 +142,7 @@ pub(all) struct TraceScatter2D[U, V, N] {
 
 // Traits
 pub(open) trait Category {
-  get_cate(Self) -> String
+  get_cate(Self) -> Categories
 }
 
 pub(open) trait Compose {

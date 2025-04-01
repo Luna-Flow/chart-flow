@@ -145,3 +145,13 @@ pub(all) struct ChartScatter2D[U, V, N] {
   traces : Array[TraceScatter2D[U, V, N]]
   layout : LayoutScatter?
 }
+
+///|
+pub(all) enum Categories {
+  SYM_CATE_SHAPE
+  SYM_CATE_STYLE
+  LP_CATE_NONE
+  LP_CATE_STYLE
+  POS_CATE_VERTICAL
+  POS_CATE_HORIZONTAL
+} derive(Eq)
