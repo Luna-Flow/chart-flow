@@ -3,7 +3,10 @@ package Luna-Flow/chart-flow
 // Values
 
 // Types and methods
-pub(all) struct Chart {
+pub(all) struct ChartScatter2D[U, V, N] {
+  name : String
+  traces : Array[TraceScatter2D[U, V, N]]
+  layout : LayoutScatter?
 }
 
 pub(all) enum Color {
@@ -23,32 +26,34 @@ pub(all) enum Dash {
 }
 
 pub(all) struct Font {
-  line_pos : LinePosition
-  family : String
-  size : UInt
-  color : Color
+  line_pos : Array[LinePosition]?
+  family : String?
+  size : UInt?
+  color : Color?
+  style : FontStyle?
+  weight : FontStyle?
 }
 
 pub(all) enum FontStyle {
   Normal
   Italic
-  Bold
+  Bold(Int)
 }
 
 pub(all) struct LayoutScatter {
-  title : Title
-  width : UInt
-  height : UInt
-  bg_color : Color
+  title : Title?
+  width : UInt?
+  height : UInt?
+  bg_color : Color?
 }
 
 pub(all) struct Line {
-  width : UInt
-  dash : Dash
-  shape : Shape
-  smoothing : Float
-  color : Color
-  opacity : Float
+  width : UInt?
+  dash : Dash?
+  shape : Shape?
+  smoothing : Float?
+  color : Color?
+  opacity : Float?
 }
 
 pub(all) enum LinePosition {
@@ -59,11 +64,20 @@ pub(all) enum LinePosition {
 }
 
 pub(all) struct Marker {
-  symbol : Array[Symbol]
-  size : UInt
-  color : Color
-  color_scale : (Color, Color)
-  opacity : Float
+  symbol : Array[Symbol]?
+  size : UInt?
+  color : Color?
+  color_scale : (Color, Color)?
+  opacity : Float?
+}
+
+pub(all) enum Position {
+  Top
+  Middle
+  Bottom
+  Left
+  Center
+  Right
 }
 
 pub(all) enum Shape {
@@ -87,23 +101,10 @@ pub(all) enum Symbol {
   Open
   X
   Cross
-  Dot
-}
-
-pub(all) enum TextPosition {
-  TL
-  TC
-  TR
-  ML
-  MC
-  MR
-  BL
-  BC
-  BR
 }
 
 pub(all) struct Title {
-  font : Font
+  font : Font?
   text : String
 }
 
@@ -118,19 +119,24 @@ pub(all) struct TraceScatter2D[U, V, N] {
   mode : TraceModeScatter
   x : Array[U]
   y : Array[V]
-  text : Array[String]
-  dx : N
-  dy : N
-  text_font : Font
-  marker : Marker
-  line : Line
+  text : Array[String]?
+  dx : N?
+  dy : N?
+  text_font : Font?
+  text_position : (Position, Position)?
+  marker : Marker?
+  line : Line?
 }
 
 // Type aliases
 
 // Traits
+pub(open) trait Category {
+  get_cate(Self) -> String
+}
+
 pub(open) trait Compose {
-  compose(Array[Self]) -> String
+  compose(Array[Self]) -> Json
   is_valid(Array[Self]) -> Bool
 }
 

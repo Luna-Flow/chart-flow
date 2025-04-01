@@ -1,7 +1,7 @@
 {
     "is-main": true,
     "import": [
-        "moonbitlang/x/fs",
+        //"moonbitlang/x/fs",
         {
             "path": "Luna-Flow/luna-utils",
             "alias": "lu"

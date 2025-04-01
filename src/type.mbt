@@ -92,17 +92,17 @@ pub(all) struct Font {
 
 ///|
 pub(all) struct Title {
-  font : Font
+  font : Font?
   text : String
 }
 
 //Layout Props
 ///|
 pub(all) struct LayoutScatter {
-  title : Title
-  width : UInt
-  height : UInt
-  bg_color : Color
+  title : Title?
+  width : UInt?
+  height : UInt?
+  bg_color : Color?
 }
 
 //Trace Props
@@ -114,16 +114,13 @@ pub(all) enum TraceModeScatter {
 }
 
 ///|
-pub(all) enum TextPosition {
-  TL
-  TC
-  TR
-  ML
-  MC
-  MR
-  BL
-  BC
-  BR
+pub(all) enum Position {
+  Top
+  Middle
+  Bottom
+  Left
+  Center
+  Right
 }
 
 ///|
@@ -132,14 +129,19 @@ pub(all) struct TraceScatter2D[U, V, N] {
   mode : TraceModeScatter
   x : Array[U]
   y : Array[V]
-  text : Array[String]
-  dx : N
-  dy : N
-  text_font : Font
-  marker : Marker
-  line : Line
+  text : Array[String]?
+  dx : N?
+  dy : N?
+  text_font : Font?
+  text_position : (Position, Position)?
+  marker : Marker?
+  line : Line?
 }
 
 //Chart Props
 ///|
-pub(all) struct Chart {}
+pub(all) struct ChartScatter2D[U, V, N] {
+  name : String
+  traces : Array[TraceScatter2D[U, V, N]]
+  layout : LayoutScatter?
+}

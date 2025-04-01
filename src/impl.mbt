@@ -81,10 +81,10 @@ fn compose_json(a : Json, b : Json, connector : String) -> Json {
 }
 
 ///|
-const SYM_CATE_SHAPE = "shape"
+const SYM_CATE_SHAPE = "sh"
 
 ///|
-const SYM_CATE_STYLE = "style"
+const SYM_CATE_STYLE = "st"
 
 ///|
 impl Category for Symbol with get_cate(s) {
@@ -193,10 +193,10 @@ impl ToJson for Line with to_json(s) {
 }
 
 ///|
-const LP_CATE_NONE = "none"
+const LP_CATE_NONE = "n"
 
 ///|
-const LP_CATE_STYLE = "style"
+const LP_CATE_STYLE = "s"
 
 ///|
 impl Category for LinePosition with get_cate(s) {
@@ -276,6 +276,148 @@ impl ToJson for Font with to_json(s) {
       Bold(_) => obj.set("weight", s.weight.unwrap().to_json())
       _ => abort("Invalid weight component")
     }
+  }
+  Object(obj)
+}
+
+///|
+impl ToJson for Title with to_json(s) {
+  let obj : Map[String, Json] = Map::new()..set("text", s.text.to_json())
+  if s.font is Some(_) {
+    obj.set("font", s.font.unwrap().to_json())
+  }
+  Object(obj)
+}
+
+///|
+impl ToJson for LayoutScatter with to_json(s) {
+  let obj : Map[String, Json] = Map::new()
+  if s.title is Some(_) {
+    obj.set("title", s.title.unwrap().to_json())
+  }
+  if s.width is Some(_) {
+    obj.set("width", s.width.unwrap().to_json())
+  }
+  if s.height is Some(_) {
+    obj.set("height", s.height.unwrap().to_json())
+  }
+  Object(obj)
+}
+
+///|
+impl ToJson for TraceModeScatter with to_json(s) {
+  let str = match s {
+    Markers => "markers"
+    Lines => "lines"
+    MarkersLines => "lines+markers"
+  }
+  str.to_json()
+}
+
+///|
+const POS_CATE_VERTICAL = "v"
+
+///|
+const POS_CATE_HORIZONTAL = "h"
+
+///|
+impl Category for Position with get_cate(s) {
+  match s {
+    Left => POS_CATE_VERTICAL
+    Right => POS_CATE_VERTICAL
+    Center => POS_CATE_VERTICAL
+    Top => POS_CATE_HORIZONTAL
+    Bottom => POS_CATE_HORIZONTAL
+    Middle => POS_CATE_HORIZONTAL
+  }
+}
+
+///|
+impl ToJson for Position with to_json(s) {
+  match s {
+    Left => String("left")
+    Right => String("right")
+    Center => String("center")
+    Top => String("top")
+    Bottom => String("bottom")
+    Middle => String("middle")
+  }
+}
+
+///|
+impl Compose for Position with compose(arr) {
+  compose_json(arr[0].to_json(), arr[1].to_json(), " ")
+}
+
+///|
+impl Compose for Position with is_valid(arr) {
+  let len = arr.length()
+  if len == 2 {
+    let cate_map = []
+    for x in arr {
+      cate_map.push(Category::get_cate(x))
+    }
+    if cate_map == [POS_CATE_HORIZONTAL, POS_CATE_VERTICAL] {
+      true
+    } else {
+      false
+    }
+  } else {
+    false
+  }
+}
+
+///|
+impl[U : ToJson, V : ToJson, N] ToJson for TraceScatter2D[U, V, N] with to_json(
+  s
+) {
+  let obj : Map[String, Json] = Map::new()
+    ..set("type", String("scatter"))
+    ..set("name", s.name.to_json())
+    ..set("mode", s.mode.to_json())
+    ..set("x", s.x.to_json())
+    ..set("y", s.y.to_json())
+  if s.text is Some(_) {
+    obj.set("text", s.text.unwrap().to_json())
+    if s.text_font is Some(_) {
+      obj.set("textfont", s.text_font.unwrap().to_json())
+    }
+    if s.text_position is Some(_) {
+      let pos_arr = [s.text_position.unwrap().0, s.text_position.unwrap().1]
+      if Compose::is_valid(pos_arr) {
+        obj.set("textposition", Compose::compose(pos_arr))
+      } else {
+        abort("Invalid textposition component")
+      }
+    }
+  }
+  if (s.mode is Markers(_) || s.mode is MarkersLines(_)) && s.marker is Some(_) {
+    obj.set("marker", s.marker.unwrap().to_json())
+  }
+  if (s.mode is Lines(_) || s.mode is MarkersLines(_)) && s.line is Some(_) {
+    obj.set("line", s.line.unwrap().to_json())
+  }
+  Object(obj)
+}
+
+///|
+impl[U : ToJson, V : ToJson, N] ToJson for ChartScatter2D[U, V, N] with to_json(
+  s
+) {
+  let obj : Map[String, Json] = Map::new()..set("chart_name", s.name.to_json())
+  fn rename(s : TraceScatter2D[U, V, N], i : Int) -> String {
+    s.name + i.to_string()
+  }
+
+  let name_arr = []
+  for i in 0..<s.traces.length() {
+    let new_name = rename(s.traces[i], i)
+    obj.set(new_name, s.traces[i].to_json())
+    name_arr.push(new_name)
+  }
+  obj.set("traces", name_arr.to_json())
+  if s.layout is Some(_) {
+    obj.set("layout", s.layout.unwrap().to_json())
   }
   Object(obj)
 }
