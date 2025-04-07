@@ -1,2 +1,1 @@
-///|
-fnalias @lu.(same_to, clamp)
+//fnalias  @math.(maximum as max, minimum as min)

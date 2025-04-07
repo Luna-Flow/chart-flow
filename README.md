@@ -1,5 +1,3 @@
 # Chart-Flow
-A Chart IR Generator for Luna Flow.
 
-backend:
-- Plotly.js
+A framework and embedded domain-specific language for creating declarative vector graphics and charts.
