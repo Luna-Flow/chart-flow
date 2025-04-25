@@ -1,9 +1,43 @@
 package "Luna-Flow/chart-flow"
 
 // Values
+let black : Color
+
+let dft_bar_style : BarStyle
+
+let dft_font : String
+
+let dft_line_style : LineStyle
+
+let dft_line_type : LineType
+
+let dft_scatter_style : ScatterStyle
+
+let dft_scatter_type : ScatterType
+
+let dft_text_style : TextStyle
+
+let dft_title_style : TextStyle
+
+fn empty_chart() -> Chart
+
+fn empty_line_trace() -> Trace
+
+fn line_trace(Array[Point2D], style~ : LineStyle = ..) -> Trace
+
 fn min_max_scale(Array[Double]) -> Array[Double]
 
 fn normalize_data((Double) -> Double, Array[Double]) -> Array[Double]
+
+fn to_rgb(Color) -> Color
+
+let transparent : Color
+
+let white : Color
+
+fn with_color(Trace, Color) -> Trace
+
+fn with_data(Trace, Array[Point2D]) -> Trace
 
 // Types and methods
 type AxisConfig
@@ -15,6 +49,9 @@ type BarStyle
 type Chart
 
 type Color
+impl Color {
+  to_rgb(Self) -> Self
+}
 
 type LineStyle
 
@@ -26,13 +63,24 @@ type ScatterStyle
 
 type ScatterType
 
-type Shape
-
 type TextStyle
 
 type Trace
+impl Trace {
+  with_color(Self, Color) -> Self
+  with_data(Self, Array[Point2D]) -> Self
+}
 
 // Type aliases
 
 // Traits
+pub(open) trait Size {
+  with_size(Self, UInt) -> Self
+}
+
+pub(open) trait Style {
+  apply_to(Self, Trace) -> Trace
+  with_color(Self, Color) -> Self
+  with_size(Self, UInt) -> Self
+}
 
