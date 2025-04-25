@@ -2,12 +2,11 @@
   "name": "Luna-Flow/chart-flow",
   "version": "0.0.1-alpha-1",
   "deps": {
-    "moonbitlang/x": "0.4.23",
-    "Luna-Flow/luna-utils": "0.1.0-alpha-3"
+    "moonbitlang/x": "0.4.23"
   },
   "readme": "README.md",
   "repository": "",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "keywords": [
     "chart",
     "IR"
