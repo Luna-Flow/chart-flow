@@ -2,16 +2,6 @@
 type Point2D (Double, Double)
 
 ///|
-enum Color {
-  Transparent
-  RGB(UInt, UInt, UInt)
-  RGBA(UInt, UInt, UInt, Double)
-  HSV(UInt, UInt, UInt)
-  HSL(UInt, UInt, UInt)
-  CMYK(UInt, UInt, UInt, UInt)
-}
-
-///|
 // enum Shape {
 //   Circle(Point2D, Double)
 //   Rectangle(Point2D, Point2D)
