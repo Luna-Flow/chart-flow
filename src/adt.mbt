@@ -1,84 +1,80 @@
 ///|
-type Point2D (Double, Double)
+pub(all) type Position (Double, Double)
 
 ///|
-// enum Shape {
-//   Circle(Point2D, Double)
-//   Rectangle(Point2D, Point2D)
-//   Polygon(Array[Point2D])
-//   Line(Point2D, Point2D)
-//   Text(Point2D, String)
-// }
-
-///|
-enum ScatterType {
-  //ScatterType size
-  Circle(UInt)
-  Square(UInt)
-  Triangle(UInt)
-  Diamond(UInt)
-  Cross(UInt)
-  X(UInt)
-  Star(UInt)
+pub(all) enum PathCommand {
+  //Move(dx, dy)
+  Move(Position)
+  //MoveTo(x, y)
+  MoveTo(Position)
+  //Line(dx, dy)
+  Line(Position)
+  //LineTo(x, y)
+  LineTo(Position)
+  //Horizontal(dx)
+  Horizontal(Double)
+  //HorizontalTo(x)
+  HorizontalTo(Position)
+  //Vertical(dy)
+  Vertical(Double)
+  //VerticalTo(y)
+  VerticalTo(Position)
+  //Quadratic(dx1, dy1, dx, dy)
+  Quadratic(Position, Position)
+  //QuadraticTo(x1, y1, x, y)
+  QuadraticTo(Position, Position)
+  //SmoothQuadratic(dx, dy)
+  SmoothQuadratic(Position)
+  //SmoothQuadraticTo(x, y)
+  SmoothQuadraticTo(Position)
+  //Cubic(dx1, dy1, dx2, dy2, dx, dy)
+  Cubic(Position, Position, Position)
+  //CubicTo(x1, y1, x2, y2, x, y)
+  CubicTo(Position, Position, Position)
+  //SmoothCubic(dx2, dy2, dx, dy)
+  SmoothCubic(Position)
+  //SmoothCubicTo(x2, y2, x, y)
+  SmoothCubicTo(Position)
+  //Arc(rx, ry, xAxisRotation<deg>, largeArcFlag, sweepFlag, dx, dy)
+  Arc(Double, Double, Double, Bool, Bool, Position)
+  //ArcTo(rx, ry, xAxisRotation<deg>, largeArcFlag, sweepFlag, x, y)
+  ArcTo(Double, Double, Double, Bool, Bool, Position)
+  Close
 }
 
 ///|
-enum ScatterStyle {
-  ScatterStyle(ScatterType, Color)
+pub(all) enum GradientType {
+  Linear
+  Radial
 }
 
 ///|
-enum LineType {
-  //Solid width
-  Solid(UInt)
-  //Dot width gap
-  Dot(UInt, Double)
-  //Dash width length gap
-  Dash(UInt, Double, Double)
+pub(all) type GradientStop (&Color, Double)
+
+///|
+pub(all) enum Paint {
+  Solid(&Color)
+  //Gradient(GradientType, start_color, start, end_color, end, gradient_stops)
+  Gradient(
+    GradientType,
+    &Color,
+    Position,
+    &Color,
+    Position,
+    Array[GradientStop]
+  )
 }
 
 ///|
-enum LineStyle {
-  LineStyle(LineType, Color)
-  LineStyleWithMarker(LineStyle, ScatterStyle)
+pub(all) type Path Array[PathCommand]
+
+///|
+pub(all) struct Stroke {
+  width : Double
+  color : Paint
 }
 
 ///|
-enum BarStyle {
-  //BarStyle stroke_width stroke fill
-  BarStyle(UInt, Color, Color)
-}
-
-///|
-enum TextStyle {
-  //TextStyle size font color
-  TextStyle(UInt, String, Color)
-}
-
-///|
-enum Trace {
-  //Trace name font? data style
-  LineTrace(String, TextStyle?, Array[Point2D], LineStyle)
-  ScatterTrace(String, TextStyle?, Array[Point2D], ScatterStyle)
-  BarTrace(String, TextStyle?, Array[Point2D], BarStyle)
-}
-
-///|
-enum AxisType {
-  //AxisType unit
-  Linear(String)
-  Log(String)
-}
-
-///|
-struct AxisConfig {
-  label : (String, TextStyle?)?
-}
-
-///|
-struct Chart {
-  title : (String, TextStyle?)?
-  trace : Array[Trace]
-  x_axis : AxisType?
-  y_axis : AxisType?
+pub(all) struct Fill {
+  color : Paint
 }

@@ -1,86 +1,60 @@
 package "Luna-Flow/chart-flow"
 
+import(
+  "gmlewis/image/color"
+)
+
 // Values
-let black : Color
-
-let dft_bar_style : BarStyle
-
-let dft_font : String
-
-let dft_line_style : LineStyle
-
-let dft_line_type : LineType
-
-let dft_scatter_style : ScatterStyle
-
-let dft_scatter_type : ScatterType
-
-let dft_text_style : TextStyle
-
-let dft_title_style : TextStyle
-
-fn empty_chart() -> Chart
-
-fn empty_line_trace() -> Trace
-
-fn line_trace(Array[Point2D], style~ : LineStyle = ..) -> Trace
-
-fn min_max_scale(Array[Double]) -> Array[Double]
-
-fn normalize_data((Double) -> Double, Array[Double]) -> Array[Double]
-
-fn to_rgb(Color) -> Color
-
-let transparent : Color
-
-let white : Color
-
-fn with_color(Trace, Color) -> Trace
-
-fn with_data(Trace, Array[Point2D]) -> Trace
 
 // Types and methods
-type AxisConfig
-
-type AxisType
-
-type BarStyle
-
-type Chart
-
-type Color
-impl Color {
-  to_rgb(Self) -> Self
+pub(all) struct Fill {
+  color : Paint
 }
 
-type LineStyle
+pub(all) type GradientStop (&@color.Color, Double)
 
-type LineType
+pub(all) enum GradientType {
+  Linear
+  Radial
+}
 
-type Point2D
+pub(all) enum Paint {
+  Solid(&@color.Color)
+  Gradient(GradientType, &@color.Color, Position, &@color.Color, Position, Array[GradientStop])
+}
 
-type ScatterStyle
+pub(all) type Path Array[PathCommand]
 
-type ScatterType
+pub(all) enum PathCommand {
+  Move(Position)
+  MoveTo(Position)
+  Line(Position)
+  LineTo(Position)
+  Horizontal(Double)
+  HorizontalTo(Position)
+  Vertical(Double)
+  VerticalTo(Position)
+  Quadratic(Position, Position)
+  QuadraticTo(Position, Position)
+  SmoothQuadratic(Position)
+  SmoothQuadraticTo(Position)
+  Cubic(Position, Position, Position)
+  CubicTo(Position, Position, Position)
+  SmoothCubic(Position)
+  SmoothCubicTo(Position)
+  Arc(Double, Double, Double, Bool, Bool, Position)
+  ArcTo(Double, Double, Double, Bool, Bool, Position)
+  Close
+}
 
-type TextStyle
+pub(all) type Position (Double, Double)
 
-type Trace
-impl Trace {
-  with_color(Self, Color) -> Self
-  with_data(Self, Array[Point2D]) -> Self
+pub(all) struct Stroke {
+  width : Double
+  color : Paint
 }
 
 // Type aliases
 
 // Traits
-pub(open) trait Size {
-  with_size(Self, UInt) -> Self
-}
-
-pub(open) trait Style {
-  apply_to(Self, Trace) -> Trace
-  with_color(Self, Color) -> Self
-  with_size(Self, UInt) -> Self
-}
 
