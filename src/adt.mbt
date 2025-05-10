@@ -66,7 +66,7 @@ pub(all) enum Paint {
 }
 
 ///|
-pub(all) type Path Array[PathCommand]
+pub(all) type Path List[PathCommand]
 
 ///|
 pub(all) struct Stroke {
@@ -77,4 +77,19 @@ pub(all) struct Stroke {
 ///|
 pub(all) struct Fill {
   color : Paint
+}
+
+pub(all) struct Element {
+  anchor : Position
+  path : Path
+  fill : Fill?
+  stroke : Stroke?
+}
+
+pub(all) struct Layer {
+  elements : Array[Element]
+  index : Int
+  name : String
+  visible : Bool
+  opacity : Double
 }
