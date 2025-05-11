@@ -1,1 +1,3 @@
-//fnalias  @math.(maximum as max, minimum as min)
+///|
+traitalias @color.Color
+typealias List[A] = @moonbitlang/core/list.T[A]

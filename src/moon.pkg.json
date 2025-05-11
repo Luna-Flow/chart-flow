@@ -1,5 +1,8 @@
 {
     "import": [
-        //"moonbitlang/x/fs",
+        {
+            "path": "gmlewis/image/color",
+            "alias": "color"
+        }
     ]
 }

@@ -2,7 +2,8 @@
   "name": "Luna-Flow/chart-flow",
   "version": "0.0.1-alpha-1",
   "deps": {
-    "moonbitlang/x": "0.4.23"
+    "moonbitlang/x": "0.4.26",
+    "gmlewis/image": "0.16.10"
   },
   "readme": "README.md",
   "repository": "",
