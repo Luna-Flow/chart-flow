@@ -53,37 +53,34 @@ pub(all) type GradientStop (&Color, Double)
 
 ///|
 pub(all) enum Paint {
-  Solid(&Color)
+  Solid(RGBA)
   //Gradient(GradientType, start_color, start, end_color, end, gradient_stops)
-  Gradient(
-    GradientType,
-    &Color,
-    Position,
-    &Color,
-    Position,
-    Array[GradientStop]
-  )
+  Gradient(GradientType, RGBA, Position, RGBA, Position, Array[GradientStop])
 }
 
 ///|
 pub(all) type Path List[PathCommand]
 
+///|
 pub(all) enum LineCap {
   Butt
   Round
   Square
 }
 
+///|
 pub(all) enum LineJoin {
   Miter
   Round
   Bevel
 }
 
+///|
 pub(all) struct DashPattern {
   length : Double
   gap : Double
 }
+
 ///|
 pub(all) struct Stroke {
   width : Double
@@ -94,10 +91,12 @@ pub(all) struct Stroke {
   dash_pattern : Array[DashPattern]
 }
 
+///|
 pub(all) enum FillRule {
   NonZero
   EvenOdd
 }
+
 ///|
 pub(all) struct Fill {
   color : Paint
@@ -105,13 +104,27 @@ pub(all) struct Fill {
   rule : FillRule
 }
 
-pub(all) struct Element {
+///|
+pub(all) enum Transform {
+  Combine(Transform, Transform)
+  Matrix(Double, Double, Double, Double, Double, Double)
+  Translate(Double, Double)
+  Scale(Double, Double)
+  Rotate(Double, Position?)
+  SkewX(Double)
+  SkewY(Double)
+}
+
+///|
+pub(all) struct PathElement {
   anchor : Position
   path : Path
   fill : Fill?
   stroke : Stroke?
+  transform : Transform?
 }
 
+///|
 pub(all) struct TextElement {
   content : String
   position : Position
@@ -120,23 +133,36 @@ pub(all) struct TextElement {
   text_anchor : TextAnchor
   fill : Fill?
   stroke : Stroke?
+  transform : Transform?
 }
 
+///|
 pub(all) enum TextAnchor {
   Start
   Middle
   End
 }
 
+///|
 pub(all) struct ImageElement {
   href : String
   width : Double
   height : Double
   position : Position
+  transform : Transform?
 }
 
+///|
+pub(all) struct ShapeElement[S] {
+  anchor : Position
+  shape : S
+  fill : Fill?
+  stroke : Stroke?
+}
+
+///|
 pub(all) struct Layer {
-  elements : Array[Element]
+  elements : Array[&Element]
   index : Int
   name : String
   visible : Bool
