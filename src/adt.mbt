@@ -68,15 +68,41 @@ pub(all) enum Paint {
 ///|
 pub(all) type Path List[PathCommand]
 
+pub(all) enum LineCap {
+  Butt
+  Round
+  Square
+}
+
+pub(all) enum LineJoin {
+  Miter
+  Round
+  Bevel
+}
+
+pub(all) struct DashPattern {
+  length : Double
+  gap : Double
+}
 ///|
 pub(all) struct Stroke {
   width : Double
   color : Paint
+  line_cap : LineCap
+  line_join : LineJoin
+  miter_limit : Double
+  dash_pattern : Array[DashPattern]
 }
 
+pub(all) enum FillRule {
+  NonZero
+  EvenOdd
+}
 ///|
 pub(all) struct Fill {
   color : Paint
+  opacity : Double?
+  rule : FillRule
 }
 
 pub(all) struct Element {
@@ -84,6 +110,29 @@ pub(all) struct Element {
   path : Path
   fill : Fill?
   stroke : Stroke?
+}
+
+pub(all) struct TextElement {
+  content : String
+  position : Position
+  font_family : String
+  font_size : Double
+  text_anchor : TextAnchor
+  fill : Fill?
+  stroke : Stroke?
+}
+
+pub(all) enum TextAnchor {
+  Start
+  Middle
+  End
+}
+
+pub(all) struct ImageElement {
+  href : String
+  width : Double
+  height : Double
+  position : Position
 }
 
 pub(all) struct Layer {
