@@ -2,6 +2,44 @@
 struct Size {
   num : Double
   pct : Double
+  parent : Size?
+} derive(Eq)
+
+///|
+pub fn Size::same_parent(self : Size, other : Size) -> Bool {
+  if self.parent == other.parent {
+    true
+  } else {
+    false
+  }
+}
+
+///|
+fn Size::calc(self : Size, global : Double) -> Double {
+  if self.parent is None {
+    if self.pct == 0.0 {
+      self.num
+    } else {
+      self.num + self.pct * global / 100.0 
+    }
+  } else if self.pct == 0.0 {
+    self.num + self.parent.unwrap().calc(global)
+  } else {
+    self.num + self.pct * self.parent.unwrap().calc(global) / 100.0
+  }
+}
+
+///|
+pub impl Add for Size with op_add(self, other) {
+  if self.same_parent(other) {
+    Size::{
+      num: self.num + other.num,
+      pct: self.pct + other.pct,
+      parent: self.parent,
+    }
+  } else {
+    abort("Cannot add sizes with different parents")
+  }
 }
 
 ///|
@@ -61,14 +99,7 @@ pub(all) type GradientStop (&Color, Double)
 pub(all) enum Paint {
   Solid(RGBA)
   //Gradient(GradientType, start_color, start, end_color, end, gradient_stops)
-  Gradient(
-    GradientType,
-    RGBA,
-    Position,
-    RGBA,
-    Position,
-    Array[GradientStop]
-  )
+  Gradient(GradientType, RGBA, Position, RGBA, Position, Array[GradientStop])
 }
 
 ///|
