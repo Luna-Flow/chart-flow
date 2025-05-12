@@ -2,16 +2,16 @@ package "Luna-Flow/chart-flow"
 
 import(
   "gmlewis/image/color"
-  "moonbitlang/core/list"
+  "moonbitlang/core/immut/list"
 )
 
 // Values
 
 // Types and methods
-pub(all) struct Circle[T] {
-  center_x : T
-  center_y : T
-  radius : T
+pub(all) struct Circle {
+  center_x : Size
+  center_y : Size
+  radius : Size
 }
 
 pub(all) struct DashPattern {
@@ -19,11 +19,11 @@ pub(all) struct DashPattern {
   gap : Double
 }
 
-pub(all) struct Ellipse[T] {
-  center_x : T
-  center_y : T
-  radius_x : T
-  radius_y : T
+pub(all) struct Ellipse {
+  center_x : Size
+  center_y : Size
+  radius_x : Size
+  radius_y : Size
 }
 
 pub(all) struct Fill {
@@ -37,7 +37,8 @@ pub(all) enum FillRule {
   EvenOdd
 }
 
-pub(all) type GradientStop (&@color.Color, Double)
+pub(all) type GradientStop (@color.RGBA, Size)
+impl ToSVG for GradientStop
 
 pub(all) enum GradientType {
   Linear
@@ -60,11 +61,11 @@ pub(all) struct Layer {
   opacity : Double
 }
 
-pub(all) struct Line[T] {
-  x1 : T
-  y1 : T
-  x2 : T
-  y2 : T
+pub(all) struct Line {
+  x1 : Size
+  y1 : Size
+  x2 : Size
+  y2 : Size
 }
 
 pub(all) enum LineCap {
@@ -79,38 +80,39 @@ pub(all) enum LineJoin {
   Bevel
 }
 
-pub(all) enum Number {
-  Number(Double)
-}
-
 pub(all) enum Paint {
   Solid(@color.RGBA)
   Gradient(GradientType, @color.RGBA, Position, @color.RGBA, Position, Array[GradientStop])
 }
 
 pub(all) type Path @list.T[PathCommand]
+impl Path {
+  from_array(Array[PathCommand]) -> Self
+}
+impl ToSVG for Path
 
 pub(all) enum PathCommand {
   Move(Position)
   MoveTo(Position)
   Line(Position)
   LineTo(Position)
-  Horizontal(Double)
-  HorizontalTo(Position)
-  Vertical(Double)
-  VerticalTo(Position)
+  Horizontal(Size)
+  HorizontalTo(Size)
+  Vertical(Size)
+  VerticalTo(Size)
   Quadratic(Position, Position)
   QuadraticTo(Position, Position)
   SmoothQuadratic(Position)
   SmoothQuadraticTo(Position)
   Cubic(Position, Position, Position)
   CubicTo(Position, Position, Position)
-  SmoothCubic(Position)
-  SmoothCubicTo(Position)
-  Arc(Double, Double, Double, Bool, Bool, Position)
-  ArcTo(Double, Double, Double, Bool, Bool, Position)
+  SmoothCubic(Position, Position)
+  SmoothCubicTo(Position, Position)
+  Arc(Position, Double, Bool, Bool, Position)
+  ArcTo(Position, Double, Bool, Bool, Position)
   Close
 }
+impl ToSVG for PathCommand
 
 pub(all) struct PathElement {
   anchor : Position
@@ -119,10 +121,7 @@ pub(all) struct PathElement {
   stroke : Stroke?
   transform : Transform?
 }
-
-pub(all) enum Percent {
-  Percent(Double)
-}
+impl ToSVG for PathElement
 
 pub(all) struct Polygon {
   points : @list.T[Position]
@@ -132,7 +131,7 @@ pub(all) struct Polyline {
   points : @list.T[Position]
 }
 
-pub(all) type Position (Double, Double)
+type Position
 
 pub(all) struct ShapeElement[S] {
   anchor : Position
@@ -140,6 +139,13 @@ pub(all) struct ShapeElement[S] {
   fill : Fill?
   stroke : Stroke?
 }
+
+type Size
+impl Size {
+  same_parent(Self, Self) -> Bool
+}
+impl Add for Size
+impl Eq for Size
 
 pub(all) struct Stroke {
   width : Double
@@ -170,7 +176,7 @@ pub(all) struct TextElement {
 pub(all) enum Transform {
   Combine(Transform, Transform)
   Matrix(Double, Double, Double, Double, Double, Double)
-  Translate(Double, Double)
+  Translate(Position)
   Scale(Double, Double)
   Rotate(Double, Position?)
   SkewX(Double)
@@ -183,9 +189,16 @@ pub(all) enum Transform {
 pub(open) trait Element {
 }
 
-pub(open) trait NumberType {
+pub(open) trait Shape {
+  to_path(Self) -> Path
 }
 
-pub(open) trait Shape {
+pub(open) trait ToHex {
+  to_hex(Self) -> String
+}
+impl ToHex for Byte
+
+pub(open) trait ToSVG {
+  to_svg(Self, Double) -> String
 }
 

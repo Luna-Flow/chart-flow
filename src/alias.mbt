@@ -5,4 +5,4 @@ traitalias @color.Color
 typealias RGBA = @color.RGBA
 
 ///|
-typealias List[A] = @moonbitlang/core/list.T[A]
+typealias List[A] = @moonbitlang/core/immut/list.T[A]

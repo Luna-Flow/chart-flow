@@ -20,7 +20,7 @@ fn Size::calc(self : Size, global : Double) -> Double {
     if self.pct == 0.0 {
       self.num
     } else {
-      self.num + self.pct * global / 100.0 
+      self.num + self.pct * global / 100.0
     }
   } else if self.pct == 0.0 {
     self.num + self.parent.unwrap().calc(global)
@@ -93,7 +93,7 @@ pub(all) enum GradientType {
 }
 
 ///|
-pub(all) type GradientStop (&Color, Double)
+pub(all) type GradientStop (RGBA, Size)
 
 ///|
 pub(all) enum Paint {
