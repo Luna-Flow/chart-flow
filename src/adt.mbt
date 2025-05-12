@@ -1,5 +1,11 @@
 ///|
-pub(all) type Position (Double, Double)
+struct Size {
+  num : Double
+  pct : Double
+}
+
+///|
+type Position (Size, Size)
 
 ///|
 pub(all) enum PathCommand {
@@ -12,13 +18,13 @@ pub(all) enum PathCommand {
   //LineTo(x, y)
   LineTo(Position)
   //Horizontal(dx)
-  Horizontal(Double)
+  Horizontal(Size)
   //HorizontalTo(x)
-  HorizontalTo(Position)
+  HorizontalTo(Size)
   //Vertical(dy)
-  Vertical(Double)
+  Vertical(Size)
   //VerticalTo(y)
-  VerticalTo(Position)
+  VerticalTo(Size)
   //Quadratic(dx1, dy1, dx, dy)
   Quadratic(Position, Position)
   //QuadraticTo(x1, y1, x, y)
@@ -27,18 +33,18 @@ pub(all) enum PathCommand {
   SmoothQuadratic(Position)
   //SmoothQuadraticTo(x, y)
   SmoothQuadraticTo(Position)
-  //Cubic(dx1, dy1, dx2, dy2, dx, dy)
+  //Cubic((dx1, dy1), (dx2, dy2), (dx, dy))
   Cubic(Position, Position, Position)
-  //CubicTo(x1, y1, x2, y2, x, y)
+  //CubicTo((x1, y1), (x2, y2), (x, y))
   CubicTo(Position, Position, Position)
-  //SmoothCubic(dx2, dy2, dx, dy)
-  SmoothCubic(Position)
-  //SmoothCubicTo(x2, y2, x, y)
-  SmoothCubicTo(Position)
-  //Arc(rx, ry, xAxisRotation<deg>, largeArcFlag, sweepFlag, dx, dy)
-  Arc(Double, Double, Double, Bool, Bool, Position)
-  //ArcTo(rx, ry, xAxisRotation<deg>, largeArcFlag, sweepFlag, x, y)
-  ArcTo(Double, Double, Double, Bool, Bool, Position)
+  //SmoothCubic((dx2, dy2), (dx, dy))
+  SmoothCubic(Position, Position)
+  //SmoothCubicTo((x2, y2), (x, y))
+  SmoothCubicTo(Position, Position)
+  //Arc((rx, ry), xAxisRotation<deg>, largeArcFlag, sweepFlag, (dx, dy))
+  Arc(Position, Double, Bool, Bool, Position)
+  //ArcTo((rx, ry), xAxisRotation<deg>, largeArcFlag, sweepFlag, (x, y))
+  ArcTo(Position, Double, Bool, Bool, Position)
   Close
 }
 
@@ -55,7 +61,14 @@ pub(all) type GradientStop (&Color, Double)
 pub(all) enum Paint {
   Solid(RGBA)
   //Gradient(GradientType, start_color, start, end_color, end, gradient_stops)
-  Gradient(GradientType, RGBA, Position, RGBA, Position, Array[GradientStop])
+  Gradient(
+    GradientType,
+    RGBA,
+    Position,
+    RGBA,
+    Position,
+    Array[GradientStop]
+  )
 }
 
 ///|
@@ -108,7 +121,7 @@ pub(all) struct Fill {
 pub(all) enum Transform {
   Combine(Transform, Transform)
   Matrix(Double, Double, Double, Double, Double, Double)
-  Translate(Double, Double)
+  Translate(Position)
   Scale(Double, Double)
   Rotate(Double, Position?)
   SkewX(Double)

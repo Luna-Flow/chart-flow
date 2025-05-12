@@ -2,7 +2,6 @@
 pub(open) trait Element {}
 
 ///|
-pub(open) trait Shape {}
-
-///|
-pub(open) trait NumberType {}
+pub(open) trait Shape {
+  to_path(Self) -> Path
+}
