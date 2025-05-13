@@ -6,44 +6,7 @@ struct Size {
 } derive(Eq)
 
 ///|
-pub fn Size::same_parent(self : Size, other : Size) -> Bool {
-  if self.parent == other.parent {
-    true
-  } else {
-    false
-  }
-}
-
-///|
-fn Size::calc(self : Size, global : Double) -> Double {
-  if self.parent is None {
-    if self.pct == 0.0 {
-      self.num
-    } else {
-      self.num + self.pct * global / 100.0
-    }
-  } else if self.pct == 0.0 {
-    self.num + self.parent.unwrap().calc(global)
-  } else {
-    self.num + self.pct * self.parent.unwrap().calc(global) / 100.0
-  }
-}
-
-///|
-pub impl Add for Size with op_add(self, other) {
-  if self.same_parent(other) {
-    Size::{
-      num: self.num + other.num,
-      pct: self.pct + other.pct,
-      parent: self.parent,
-    }
-  } else {
-    abort("Cannot add sizes with different parents")
-  }
-}
-
-///|
-type Position (Size, Size)
+pub(all) type Position (Size, Size)
 
 ///|
 pub(all) enum PathCommand {
@@ -87,19 +50,13 @@ pub(all) enum PathCommand {
 }
 
 ///|
-pub(all) enum GradientType {
-  Linear
-  Radial
-}
-
-///|
-pub(all) type GradientStop (RGBA, Size)
 
 ///|
 pub(all) enum Paint {
+  // Solid(color)
   Solid(RGBA)
-  //Gradient(GradientType, start_color, start, end_color, end, gradient_stops)
-  Gradient(GradientType, RGBA, Position, RGBA, Position, Array[GradientStop])
+  // Gradient(id)
+  Gradient(String)
 }
 
 ///|
@@ -114,25 +71,23 @@ pub(all) enum LineCap {
 
 ///|
 pub(all) enum LineJoin {
-  Miter
-  Round
+  Arcs
   Bevel
-}
-
-///|
-pub(all) struct DashPattern {
-  length : Double
-  gap : Double
+  Miter
+  MiterClip
+  Round
 }
 
 ///|
 pub(all) struct Stroke {
-  width : Double
   color : Paint
-  line_cap : LineCap
-  line_join : LineJoin
-  miter_limit : Double
-  dash_pattern : Array[DashPattern]
+  dash_array : Array[Double]
+  dash_offset : Double?
+  line_cap : LineCap?
+  line_join : LineJoin?
+  miter_limit : Double?
+  opacity : Double?
+  width : Double?
 }
 
 ///|
@@ -150,7 +105,6 @@ pub(all) struct Fill {
 
 ///|
 pub(all) enum Transform {
-  Combine(Transform, Transform)
   Matrix(Double, Double, Double, Double, Double, Double)
   Translate(Position)
   Scale(Double, Double)
@@ -165,7 +119,7 @@ pub(all) struct PathElement {
   path : Path
   fill : Fill?
   stroke : Stroke?
-  transform : Transform?
+  transform : List[Transform]
 }
 
 ///|
@@ -177,7 +131,7 @@ pub(all) struct TextElement {
   text_anchor : TextAnchor
   fill : Fill?
   stroke : Stroke?
-  transform : Transform?
+  transform : List[Transform]
 }
 
 ///|
@@ -193,7 +147,7 @@ pub(all) struct ImageElement {
   width : Double
   height : Double
   position : Position
-  transform : Transform?
+  transform : List[Transform]
 }
 
 ///|

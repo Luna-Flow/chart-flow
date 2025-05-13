@@ -14,11 +14,6 @@ pub(all) struct Circle {
   radius : Size
 }
 
-pub(all) struct DashPattern {
-  length : Double
-  gap : Double
-}
-
 pub(all) struct Ellipse {
   center_x : Size
   center_y : Size
@@ -37,20 +32,15 @@ pub(all) enum FillRule {
   EvenOdd
 }
 
-pub(all) type GradientStop (@color.RGBA, Size)
+pub(all) type GradientStop (Size, @color.RGBA, Double)
 impl ToSVG for GradientStop
-
-pub(all) enum GradientType {
-  Linear
-  Radial
-}
 
 pub(all) struct ImageElement {
   href : String
   width : Double
   height : Double
   position : Position
-  transform : Transform?
+  transform : @list.T[Transform]
 }
 
 pub(all) struct Layer {
@@ -73,17 +63,30 @@ pub(all) enum LineCap {
   Round
   Square
 }
+impl Show for LineCap
 
 pub(all) enum LineJoin {
-  Miter
-  Round
+  Arcs
   Bevel
+  Miter
+  MiterClip
+  Round
+}
+impl Show for LineJoin
+
+pub(all) struct LinearGradient {
+  id : String
+  start : (Double, Double)?
+  end : (Double, Double)?
+  transform : @list.T[Transform]
+  stops : Array[GradientStop]
 }
 
 pub(all) enum Paint {
   Solid(@color.RGBA)
-  Gradient(GradientType, @color.RGBA, Position, @color.RGBA, Position, Array[GradientStop])
+  Gradient(String)
 }
+impl ToSVG for Paint
 
 pub(all) type Path @list.T[PathCommand]
 impl Path {
@@ -119,9 +122,8 @@ pub(all) struct PathElement {
   path : Path
   fill : Fill?
   stroke : Stroke?
-  transform : Transform?
+  transform : @list.T[Transform]
 }
-impl ToSVG for PathElement
 
 pub(all) struct Polygon {
   points : @list.T[Position]
@@ -131,7 +133,13 @@ pub(all) struct Polyline {
   points : @list.T[Position]
 }
 
-type Position
+pub(all) type Position (Size, Size)
+
+pub(all) struct RadialGradient {
+  id : String
+  coordinate : (Double, Double)?
+  gradient_stops : Array[GradientStop]
+}
 
 pub(all) struct ShapeElement[S] {
   anchor : Position
@@ -142,19 +150,24 @@ pub(all) struct ShapeElement[S] {
 
 type Size
 impl Size {
+  calc(Self, Double) -> Double
+  calc_keep_pct(Self) -> Self
   same_parent(Self, Self) -> Bool
 }
 impl Add for Size
 impl Eq for Size
 
 pub(all) struct Stroke {
-  width : Double
   color : Paint
-  line_cap : LineCap
-  line_join : LineJoin
-  miter_limit : Double
-  dash_pattern : Array[DashPattern]
+  dash_array : Array[Double]
+  dash_offset : Double?
+  line_cap : LineCap?
+  line_join : LineJoin?
+  miter_limit : Double?
+  opacity : Double?
+  width : Double?
 }
+impl ToSVG for Stroke
 
 pub(all) enum TextAnchor {
   Start
@@ -170,11 +183,10 @@ pub(all) struct TextElement {
   text_anchor : TextAnchor
   fill : Fill?
   stroke : Stroke?
-  transform : Transform?
+  transform : @list.T[Transform]
 }
 
 pub(all) enum Transform {
-  Combine(Transform, Transform)
   Matrix(Double, Double, Double, Double, Double, Double)
   Translate(Position)
   Scale(Double, Double)
@@ -186,11 +198,19 @@ pub(all) enum Transform {
 // Type aliases
 
 // Traits
+pub(open) trait Def {
+  id(Self) -> String
+}
+
 pub(open) trait Element {
 }
 
 pub(open) trait Shape {
   to_path(Self) -> Path
+}
+
+pub(open) trait Style {
+  to_style(Self) -> String
 }
 
 pub(open) trait ToHex {
@@ -199,6 +219,6 @@ pub(open) trait ToHex {
 impl ToHex for Byte
 
 pub(open) trait ToSVG {
-  to_svg(Self, Double) -> String
+  to_svg(Self, Double?) -> String
 }
 
