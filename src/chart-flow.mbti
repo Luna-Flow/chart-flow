@@ -8,6 +8,10 @@ import(
 // Values
 
 // Types and methods
+type Block[T]
+
+type BlockAttr
+
 pub(all) struct Circle {
   center_x : Size
   center_y : Size
@@ -24,23 +28,31 @@ pub(all) struct Ellipse {
 pub(all) struct Fill {
   color : Paint
   opacity : Double?
-  rule : FillRule
+  rule : FillRule?
 }
+impl ToAttr for Fill
 
 pub(all) enum FillRule {
   NonZero
   EvenOdd
 }
+impl Show for FillRule
 
-pub(all) type GradientStop (Size, @color.RGBA, Double)
-impl ToSVG for GradientStop
+pub(all) enum GradientSpreadMethod {
+  Pad
+  Reflect
+  Repeat
+}
+
+pub(all) type GradientStop (Size, @color.RGBA, Double?)
+impl ToBlock for GradientStop
 
 pub(all) struct ImageElement {
   href : String
   width : Double
   height : Double
   position : Position
-  transform : @list.T[Transform]
+  transform : Transform
 }
 
 pub(all) struct Layer {
@@ -78,21 +90,21 @@ pub(all) struct LinearGradient {
   id : String
   start : (Double, Double)?
   end : (Double, Double)?
-  transform : @list.T[Transform]
+  transform : Transform
   stops : Array[GradientStop]
+  spread : GradientSpreadMethod?
 }
 
 pub(all) enum Paint {
   Solid(@color.RGBA)
   Gradient(String)
 }
-impl ToSVG for Paint
+impl Paint {
+  to_string(Self) -> String
+}
 
 pub(all) type Path @list.T[PathCommand]
-impl Path {
-  from_array(Array[PathCommand]) -> Self
-}
-impl ToSVG for Path
+impl ToAttr for Path
 
 pub(all) enum PathCommand {
   Move(Position)
@@ -115,15 +127,14 @@ pub(all) enum PathCommand {
   ArcTo(Position, Double, Bool, Bool, Position)
   Close
 }
-impl ToSVG for PathCommand
 
 pub(all) struct PathElement {
-  anchor : Position
   path : Path
   fill : Fill?
   stroke : Stroke?
-  transform : @list.T[Transform]
+  transform : Transform?
 }
+impl ToBlock for PathElement
 
 pub(all) struct Polygon {
   points : @list.T[Position]
@@ -138,7 +149,10 @@ pub(all) type Position (Size, Size)
 pub(all) struct RadialGradient {
   id : String
   coordinate : (Double, Double)?
-  gradient_stops : Array[GradientStop]
+  start : (Double, Double)?
+  radius : Double?
+  stops : Array[GradientStop]
+  spread : GradientSpreadMethod?
 }
 
 pub(all) struct ShapeElement[S] {
@@ -167,7 +181,7 @@ pub(all) struct Stroke {
   opacity : Double?
   width : Double?
 }
-impl ToSVG for Stroke
+impl ToAttr for Stroke
 
 pub(all) enum TextAnchor {
   Start
@@ -178,15 +192,19 @@ pub(all) enum TextAnchor {
 pub(all) struct TextElement {
   content : String
   position : Position
+  offset : Position?
+  rotate : Double?
   font_family : String
   font_size : Double
   text_anchor : TextAnchor
   fill : Fill?
   stroke : Stroke?
-  transform : @list.T[Transform]
+  transform : Transform
 }
 
-pub(all) enum Transform {
+pub(all) type Transform @list.T[TransformCommand]
+
+pub(all) enum TransformCommand {
   Matrix(Double, Double, Double, Double, Double, Double)
   Translate(Position)
   Scale(Double, Double)
@@ -198,9 +216,7 @@ pub(all) enum Transform {
 // Type aliases
 
 // Traits
-pub(open) trait Def {
-  id(Self) -> String
-}
+trait Any
 
 pub(open) trait Element {
 }
@@ -213,12 +229,20 @@ pub(open) trait Style {
   to_style(Self) -> String
 }
 
+pub(open) trait ToAttr {
+  to_attr(Self, Double?) -> Array[(String, String)]
+}
+
+pub(open) trait ToBlock {
+  to_block(Self, Double?) -> Block[&Any]
+}
+
 pub(open) trait ToHex {
   to_hex(Self) -> String
 }
 impl ToHex for Byte
 
 pub(open) trait ToSVG {
-  to_svg(Self, Double?) -> String
+  to_svg(Self) -> String
 }
 

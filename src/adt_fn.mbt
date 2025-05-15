@@ -1,9 +1,4 @@
 ///|
-pub fn Path::from_array(arr : Array[PathCommand]) -> Path {
-  @immut/list.from_array(arr)
-}
-
-///|
 pub fn Size::same_parent(self : Size, other : Size) -> Bool {
   if self.parent == other.parent {
     true
@@ -94,5 +89,18 @@ pub impl Show for LineJoin with to_string(self) {
 
 ///|
 pub impl Show for LineJoin with output(self, l) {
+  l.write_string(self.to_string())
+}
+
+///|
+pub impl Show for FillRule with to_string(self) {
+  match self {
+    NonZero => "nonzero"
+    EvenOdd => "evenodd"
+  }
+}
+
+///|
+pub impl Show for FillRule with output(self, l) {
   l.write_string(self.to_string())
 }

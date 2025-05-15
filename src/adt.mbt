@@ -100,11 +100,11 @@ pub(all) enum FillRule {
 pub(all) struct Fill {
   color : Paint
   opacity : Double?
-  rule : FillRule
+  rule : FillRule?
 }
 
 ///|
-pub(all) enum Transform {
+pub(all) enum TransformCommand {
   Matrix(Double, Double, Double, Double, Double, Double)
   Translate(Position)
   Scale(Double, Double)
@@ -114,24 +114,28 @@ pub(all) enum Transform {
 }
 
 ///|
+pub(all) type Transform List[TransformCommand]
+
+///|
 pub(all) struct PathElement {
-  anchor : Position
   path : Path
   fill : Fill?
   stroke : Stroke?
-  transform : List[Transform]
+  transform : Transform?
 }
 
 ///|
 pub(all) struct TextElement {
   content : String
   position : Position
+  offset : Position?
+  rotate : Double?
   font_family : String
   font_size : Double
   text_anchor : TextAnchor
   fill : Fill?
   stroke : Stroke?
-  transform : List[Transform]
+  transform : Transform
 }
 
 ///|
@@ -147,7 +151,7 @@ pub(all) struct ImageElement {
   width : Double
   height : Double
   position : Position
-  transform : List[Transform]
+  transform : Transform
 }
 
 ///|

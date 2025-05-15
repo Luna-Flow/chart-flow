@@ -7,9 +7,9 @@ pub(open) trait Shape {
 }
 
 ///|
-pub(open) trait Def {
-  id(Self) -> String
-}
+// pub(open) trait Def {
+//   id(Self) -> String
+// }
 
 ///|
 pub(open) trait Style {

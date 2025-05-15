@@ -49,18 +49,40 @@ test "color_cvt" {
 }
 
 ///|
-impl Def for LinearGradient with id(self) {
-  self.id
+type BlockAttr HashMap[String, String]
+
+///|
+struct Block[T] {
+  tag : String
+  attr : BlockAttr
+  content : Array[T]
 }
 
 ///|
-impl Def for RadialGradient with id(self) {
-  self.id
+typealias BasicBlock = Block[Unit]
+
+///|
+typealias TextBlock = Block[String]
+
+///|
+typealias ContentBlock[T] = Block[T]
+
+///|
+trait Any {}
+
+///|
+pub(open) trait ToAttr {
+  to_attr(Self, Double?) -> Array[(String, String)]
+}
+
+///|
+pub(open) trait ToBlock {
+  to_block(Self, Double?) -> Block[&Any]
 }
 
 ///|
 pub(open) trait ToSVG {
-  to_svg(Self, Double?) -> String
+  to_svg(Self) -> String
 }
 
 ///|
@@ -73,27 +95,32 @@ fn to_zero_one(b : Bool) -> String {
 }
 
 ///|
-pub impl ToSVG for PathCommand with to_svg(self, global) {
-  let g = global.unwrap()
+fn pmap[T](self : Position, f : (Size) -> T) -> (T, T) {
+  (f(self.0), f(self.1))
+}
+
+///|
+fn gcalc(g : Double) -> (Size) -> Double {
+  fn { y => y.calc(g) }
+}
+
+///|
+fn PathCommand::to_string(self : PathCommand, g : Double) -> String {
   match self {
     Move(p) => {
-      let x = p.0.calc(g)
-      let y = p.1.calc(g)
+      let (x, y) = p.pmap(gcalc(g))
       "m \{x}, \{y}"
     }
     MoveTo(p) => {
-      let x = p.0.calc(g)
-      let y = p.1.calc(g)
+      let (x, y) = p.pmap(gcalc(g))
       "M \{x}, \{y}"
     }
     Line(p) => {
-      let x = p.0.calc(g)
-      let y = p.1.calc(g)
+      let (x, y) = p.pmap(gcalc(g))
       "l \{x}, \{y}"
     }
     LineTo(p) => {
-      let x = p.0.calc(g)
-      let y = p.1.calc(g)
+      let (x, y) = p.pmap(gcalc(g))
       "L \{x}, \{y}"
     }
     Horizontal(s) => {
@@ -113,77 +140,57 @@ pub impl ToSVG for PathCommand with to_svg(self, global) {
       "V \{y}"
     }
     Quadratic(p, p1) => {
-      let x = p.0.calc(g)
-      let y = p.1.calc(g)
-      let x1 = p1.0.calc(g)
-      let y1 = p1.1.calc(g)
+      let (x, y) = p.pmap(gcalc(g))
+      let (x1, y1) = p1.pmap(gcalc(g))
       "q \{x}, \{y} \{x1}, \{y1}"
     }
     QuadraticTo(p, p1) => {
-      let x = p.0.calc(g)
-      let y = p.1.calc(g)
-      let x1 = p1.0.calc(g)
-      let y1 = p1.1.calc(g)
+      let (x, y) = p.pmap(gcalc(g))
+      let (x1, y1) = p1.pmap(gcalc(g))
       "Q \{x}, \{y} \{x1}, \{y1}"
     }
     SmoothQuadratic(p) => {
-      let x = p.0.calc(g)
-      let y = p.1.calc(g)
+      let (x, y) = p.pmap(gcalc(g))
       "t \{x}, \{y}"
     }
     SmoothQuadraticTo(p) => {
-      let x = p.0.calc(g)
-      let y = p.1.calc(g)
+      let (x, y) = p.pmap(gcalc(g))
       "T \{x}, \{y}"
     }
     Cubic(p, p1, p2) => {
-      let x = p.0.calc(g)
-      let y = p.1.calc(g)
-      let x1 = p1.0.calc(g)
-      let y1 = p1.1.calc(g)
-      let x2 = p2.0.calc(g)
-      let y2 = p2.1.calc(g)
+      let (x, y) = p.pmap(gcalc(g))
+      let (x1, y1) = p1.pmap(gcalc(g))
+      let (x2, y2) = p2.pmap(gcalc(g))
       "c \{x}, \{y} \{x1}, \{y1} \{x2}, \{y2}"
     }
     CubicTo(p, p1, p2) => {
-      let x = p.0.calc(g)
-      let y = p.1.calc(g)
-      let x1 = p1.0.calc(g)
-      let y1 = p1.1.calc(g)
-      let x2 = p2.0.calc(g)
-      let y2 = p2.1.calc(g)
+      let (x, y) = p.pmap(gcalc(g))
+      let (x1, y1) = p1.pmap(gcalc(g))
+      let (x2, y2) = p2.pmap(gcalc(g))
       "C \{x}, \{y} \{x1}, \{y1} \{x2}, \{y2}"
     }
     SmoothCubic(p, p1) => {
-      let x = p.0.calc(g)
-      let y = p.1.calc(g)
-      let x1 = p1.0.calc(g)
-      let y1 = p1.1.calc(g)
+      let (x, y) = p.pmap(gcalc(g))
+      let (x1, y1) = p1.pmap(gcalc(g))
       "s \{x}, \{y} \{x1}, \{y1}"
     }
     SmoothCubicTo(p, p1) => {
-      let x = p.0.calc(g)
-      let y = p.1.calc(g)
-      let x1 = p1.0.calc(g)
-      let y1 = p1.1.calc(g)
+      let (x, y) = p.pmap(gcalc(g))
+      let (x1, y1) = p1.pmap(gcalc(g))
       "S \{x}, \{y} \{x1}, \{y1}"
     }
     Arc(r, rotation, large, sweep, p1) => {
-      let rx = r.0.calc(g)
-      let ry = r.1.calc(g)
+      let (rx, ry) = r.pmap(gcalc(g))
       let large_str = to_zero_one(large)
       let sweep_str = to_zero_one(sweep)
-      let x = p1.0.calc(g)
-      let y = p1.1.calc(g)
+      let (x, y) = p1.pmap(gcalc(g))
       "a \{rx} \{ry} \{rotation} \{large_str} \{sweep_str} \{x} \{y}"
     }
     ArcTo(r, rotation, large, sweep, p1) => {
-      let rx = r.0.calc(g)
-      let ry = r.1.calc(g)
+      let (rx, ry) = r.pmap(gcalc(g))
       let large_str = to_zero_one(large)
       let sweep_str = to_zero_one(sweep)
-      let x = p1.0.calc(g)
-      let y = p1.1.calc(g)
+      let (x, y) = p1.pmap(gcalc(g))
       "A \{rx} \{ry} \{rotation} \{large_str} \{sweep_str} \{x} \{y}"
     }
     Close => "Z"
@@ -191,26 +198,78 @@ pub impl ToSVG for PathCommand with to_svg(self, global) {
 }
 
 ///|
-pub impl ToSVG for Path with to_svg(self, global) {
+pub impl ToAttr for Path with to_attr(self, g) {
   let str = loop self._, "" {
     Nil, path => break path
     Cons(command, rest), path =>
-      continue rest, path + command.to_svg(global) + " "
+      continue rest, path + command.to_string(g.unwrap()) + " "
   }
   let path = str.trim(" ").to_string()
-  "d=\"\{path}\""
+  [("d", "\"\{path}\"")]
 }
 
 ///|
-pub impl ToSVG for GradientStop with to_svg(self, _) {
-  let offset = self.0.get_pct()
-  let color = self.1.to_hex()
-  let opacity = self.2.to_string()
-  "<stop offset=\"\{offset}\" stop-color=\"\{color}\" stop-opacity=\"\{opacity}\"/>"
+fn TransformCommand::to_string(self : TransformCommand, g : Double) -> String {
+  let mut op = ""
+  let mut para = ""
+  match self {
+    Matrix(a, b, c, d, e, f) => {
+      op = "matrix"
+      para = "\{a} \{b} \{c} \{d} \{e} \{f}"
+    }
+    Translate(p) => {
+      let (x, y) = p.pmap(gcalc(g))
+      op = "translate"
+      para = "\{x} \{y}"
+    }
+    Scale(x, y) => {
+      op = "scale"
+      para = "\{x}, \{y}"
+    }
+    Rotate(angle, pos) => {
+      op = "rotate"
+      let opt_pos = pos.map_or("", fn {
+        p => ", \{p.0.calc(g)}, \{p.1.calc(g)}"
+      })
+      para = "\{angle}\{opt_pos}"
+    }
+    SkewX(angle) => {
+      op = "skewX"
+      para = "\{angle}"
+    }
+    SkewY(angle) => {
+      op = "skewY"
+      para = "\{angle}"
+    }
+  }
+  "\{op}(\{para})"
 }
 
 ///|
-pub impl ToSVG for Paint with to_svg(self, _) {
+impl ToAttr for Transform with to_attr(self, g) {
+  let str = loop self._, "" {
+    Nil, trans => break trans
+    Cons(op, rest), trans =>
+      continue rest, trans + op.to_string(g.unwrap()) + " "
+  }
+  let trans = str.trim(" ").to_string()
+  [("transform", "\"\{trans}\"")]
+}
+
+///|
+pub impl ToBlock for GradientStop with to_block(self, _) {
+  let attrs = []
+  attrs.push(("offset", self.0.get_pct()))
+  attrs.push(("stop-color", self.1.to_hex()))
+  let opacity = self.2.map_or("", fn { x => x.to_string() })
+  if opacity != "" {
+    attrs.push(("stop-opacity", opacity))
+  }
+  BasicBlock::{ tag: "stop", attr: @hashmap.from_array(attrs), content: [] }
+}
+
+///|
+pub fn Paint::to_string(self : Paint) -> String {
   match self {
     Solid(c) => c.to_hex()
     Gradient(id) => "url(#\{id})"
@@ -218,30 +277,75 @@ pub impl ToSVG for Paint with to_svg(self, _) {
 }
 
 ///|
-fn attr_stk[T : Show](x : String) -> (T) -> String {
-  fn { y => "stroke-\{x}=\"\{y}\" " }
+fn attr[T : Show](x : String) -> (String) -> (T) -> (String, String) {
+  fn { y => fn { z => ("\{x}-\{y}", "\"\{z}\"") } }
 }
 
 ///|
-pub impl ToSVG for Stroke with to_svg(self, _) {
-  let color = "stroke=\"\{self.color.to_svg(None)}\" "
-  let mut dash_array = ""
-  if self.dash_array.length() > 0 {
-    dash_array = self.dash_array.map(Double::to_string).join(" ")
-    dash_array = attr_stk("dasharray")(dash_array)
-  }
-  let dash_offset = self.dash_offset.map_or("", attr_stk("dashoffset"))
-  let line_cap = self.line_cap.map_or("", attr_stk("linecap"))
-  let line_join = self.line_join.map_or("", attr_stk("linejoin"))
-  let miter_limit = self.miter_limit.map_or("", attr_stk("miterlimit"))
-  let opacity = self.opacity.map_or("", attr_stk("opacity"))
-  let width = self.width.map_or("", attr_stk("width"))
-  "\{color}\{dash_array}\{dash_offset}\{line_cap}\{line_join}\{miter_limit}\{opacity}\{width}"
-  .trim(" ")
-  .to_string()
+fn attr_stk[T : Show](x : String) -> (T) -> (String, String) {
+  attr("stroke")(x)
 }
 
-// ///|
-// pub impl ToSVG for PathElement with to_svg(self, global) {
-//   ...
-// }
+///|
+pub impl ToAttr for Stroke with to_attr(self, _) {
+  let attr = []
+  attr.push(("stroke", self.color.to_string()))
+  if self.dash_array.length() > 0 {
+    attr.push(
+      ("stroke-dasharray", self.dash_array.map(Double::to_string).join(" ")),
+    )
+  }
+  if self.dash_offset is Some(x) {
+    attr.push(attr_stk("dashoffset")(x))
+  }
+  if self.line_cap is Some(x) {
+    attr.push(attr_stk("linecap")(x))
+  }
+  if self.line_join is Some(x) {
+    attr.push(attr_stk("linejoin")(x))
+  }
+  if self.miter_limit is Some(x) {
+    attr.push(attr_stk("miterlimit")(x))
+  }
+  if self.opacity is Some(x) {
+    attr.push(attr_stk("opacity")(x))
+  }
+  if self.width is Some(x) {
+    attr.push(attr_stk("width")(x))
+  }
+  attr
+}
+
+///|
+fn attr_fill[T : Show](x : String) -> (T) -> (String, String) {
+  attr("fill")(x)
+}
+
+///|
+pub impl ToAttr for Fill with to_attr(self, _) {
+  let attr = []
+  attr.push(("fill", self.color.to_string()))
+  if self.opacity is Some(x) {
+    attr.push(attr_fill("opacity")(x))
+  }
+  if self.rule is Some(x) {
+    attr.push(attr_fill("rule")(x))
+  }
+  attr
+}
+
+///|
+pub impl ToBlock for PathElement with to_block(self, g) {
+  let attr = []
+  attr.push_iter(self.path.to_attr(g).iter())
+  if self.fill is Some(x) {
+    attr.push_iter(x.to_attr(g).iter())
+  }
+  if self.stroke is Some(x) {
+    attr.push_iter(x.to_attr(g).iter())
+  }
+  if self.transform is Some(x) {
+    attr.push_iter(x.to_attr(g).iter())
+  }
+  BasicBlock::{ tag: "path", attr: @hashmap.from_array(attr), content: [] }
+}
