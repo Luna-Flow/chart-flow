@@ -200,12 +200,12 @@ fn PathCommand::to_string(self : PathCommand, g : Double) -> String {
 
 ///|
 pub impl ToAttr for Path with to_attr(self, g) {
-  let str = loop self._, "" {
-    Nil, path => break path
-    Cons(command, rest), path =>
-      continue rest, path + command.to_string(g.unwrap()) + " "
+  let g_ = g.unwrap()
+  fn gstr(s : PathCommand) -> String {
+    s.to_string(g_)
   }
-  let path = str.trim(" ").to_string()
+
+  let path = self._.map(gstr).join(" ")
   [("d", "\"\{path}\"")]
 }
 
@@ -248,12 +248,12 @@ fn TransformCommand::to_string(self : TransformCommand, g : Double) -> String {
 
 ///|
 impl ToAttr for Transform with to_attr(self, g) {
-  let str = loop self._, "" {
-    Nil, trans => break trans
-    Cons(op, rest), trans =>
-      continue rest, trans + op.to_string(g.unwrap()) + " "
+  let g_ = g.unwrap()
+  fn gstr(s : TransformCommand) -> String {
+    s.to_string(g_)
   }
-  let trans = str.trim(" ").to_string()
+
+  let trans = self._.map(gstr).join(" ")
   [("transform", "\"\{trans}\"")]
 }
 
@@ -391,6 +391,8 @@ pub impl ToBlock for PathElement with to_block(self, g) {
   attr.push_iter(self.path.to_attr(g).iter())
   if self.fill is Some(x) {
     attr.push_iter(x.to_attr(g).iter())
+  } else {
+    attr.push(("fill", "none"))
   }
   if self.stroke is Some(x) {
     attr.push_iter(x.to_attr(g).iter())
@@ -416,12 +418,13 @@ pub impl ToBlock for ImageElement with to_block(self, _) {
 
 ///|
 pub impl ToBlock for TextElement with to_block(self, g) {
+  let g_ = g.unwrap()
   let attr = []
-  attr.push(("x", "\{self.position.0.calc(g.unwrap())}%"))
-  attr.push(("y", "\{self.position.1.calc(g.unwrap())}%"))
+  attr.push(("x", "\{self.position.0.calc(g_)}%"))
+  attr.push(("y", "\{self.position.1.calc(g_)}%"))
   if self.offset is Some(x) {
-    attr.push(("dx", "\{x.0.calc(g.unwrap())}%"))
-    attr.push(("dy", "\{x.1.calc(g.unwrap())}%"))
+    attr.push(("dx", "\{x.0.calc(g_)}%"))
+    attr.push(("dy", "\{x.1.calc(g_)}%"))
   }
   if self.rotate is Some(x) {
     attr.push(("rotate", x.map(Double::to_string).join(" ")))
@@ -446,5 +449,79 @@ pub impl ToBlock for TextElement with to_block(self, g) {
     tag: "text",
     attr: @hashmap.from_array(attr),
     content: Some([self.content]),
+  }
+}
+
+///|
+impl ToAttr for Circle with to_attr(self, g) {
+  let g_ = g.unwrap()
+  let cx = self.center_x.calc(g_)
+  let cy = self.center_y.calc(g_)
+  let r = self.radius.calc(g_)
+  [("cx", "\{cx}"), ("cy", "\{cy}"), ("r", "\{r}")]
+}
+
+///|
+impl ToAttr for Ellipse with to_attr(self, g) {
+  let g_ = g.unwrap()
+  let cx = self.center_x.calc(g_)
+  let cy = self.center_y.calc(g_)
+  let rx = self.radius_x.calc(g_)
+  let ry = self.radius_y.calc(g_)
+  [("cx", "\{cx}"), ("cy", "\{cy}"), ("rx", "\{rx}"), ("ry", "\{ry}")]
+}
+
+///|
+impl ToAttr for Line with to_attr(self, g) {
+  let g_ = g.unwrap()
+  let x1 = self.x1.calc(g_)
+  let y1 = self.y1.calc(g_)
+  let x2 = self.x2.calc(g_)
+  let y2 = self.y2.calc(g_)
+  [("x1", "\{x1}"), ("y1", "\{y1}"), ("x2", "\{x2}"), ("y2", "\{y2}")]
+}
+
+///|
+impl ToAttr for Polygon with to_attr(self, g) {
+  let points = self.points
+    .map(fn {
+      x => {
+        let mp = x.pmap(gcalc(g.unwrap()))
+        "\{mp.0}, \{mp.1}"
+      }
+    })
+    .join(" ")
+  [("points", "\"\{points}\"")]
+}
+
+///|
+impl ToAttr for Polyline with to_attr(self, g) {
+  let points = self.points
+    .map(fn {
+      x => {
+        let mp = x.pmap(gcalc(g.unwrap()))
+        "\{mp.0}, \{mp.1}"
+      }
+    })
+    .join(" ")
+  [("points", "\"\{points}\"")]
+}
+
+///|
+impl[S : Shape + ToAttr] ToBlock for ShapeElement[S] with to_block(self, g) {
+  let attr = []
+  attr.push_iter(self.shape.to_attr(g).iter())
+  if self.fill is Some(x) {
+    attr.push_iter(x.to_attr(g).iter())
+  } else {
+    attr.push(("fill", "none"))
+  }
+  if self.stroke is Some(x) {
+    attr.push_iter(x.to_attr(g).iter())
+  }
+  Block::{
+    tag: self.shape.tag(),
+    attr: @hashmap.from_array(attr),
+    content: None,
   }
 }

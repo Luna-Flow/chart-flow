@@ -60,7 +60,7 @@ pub(all) enum Paint {
 }
 
 ///|
-pub(all) type Path List[PathCommand]
+pub(all) type Path Array[PathCommand]
 
 ///|
 pub(all) enum LineCap {
@@ -114,7 +114,7 @@ pub(all) enum TransformCommand {
 }
 
 ///|
-pub(all) type Transform List[TransformCommand]
+pub(all) type Transform Array[TransformCommand]
 
 ///|
 pub(all) struct PathElement {
@@ -156,7 +156,6 @@ pub(all) struct ImageElement {
 
 ///|
 pub(all) struct ShapeElement[S] {
-  anchor : Position
   shape : S
   fill : Fill?
   stroke : Stroke?
