@@ -125,33 +125,33 @@ pub(all) struct PathElement {
 }
 
 ///|
+pub(all) enum Identifier {
+  Id(String)
+  Class(String)
+  Both(Identifier, Identifier)
+}
+
+///|
+pub(all) struct Style {
+  identifier : Identifier
+  attr : HashMap[String, String]
+}
+
+///|
 pub(all) struct TextElement {
   content : String
   position : Position
   offset : Position?
-  rotate : Double?
-  font_family : String
-  font_size : Double
-  text_anchor : TextAnchor
-  fill : Fill?
-  stroke : Stroke?
-  transform : Transform
-}
-
-///|
-pub(all) enum TextAnchor {
-  Start
-  Middle
-  End
+  rotate : Array[Double]?
+  identifier : Identifier?
 }
 
 ///|
 pub(all) struct ImageElement {
   href : String
-  width : Double
-  height : Double
   position : Position
-  transform : Transform
+  width : Size?
+  height : Size?
 }
 
 ///|

@@ -52,23 +52,11 @@ test "color_cvt" {
 type BlockAttr HashMap[String, String]
 
 ///|
-struct Block[T] {
+struct Block {
   tag : String
   attr : BlockAttr
-  content : Array[T]
+  content : Array[String]?
 }
-
-///|
-typealias BasicBlock = Block[Unit]
-
-///|
-typealias TextBlock = Block[String]
-
-///|
-typealias ContentBlock[T] = Block[T]
-
-///|
-trait Any {}
 
 ///|
 pub(open) trait ToAttr {
@@ -77,12 +65,25 @@ pub(open) trait ToAttr {
 
 ///|
 pub(open) trait ToBlock {
-  to_block(Self, Double?) -> Block[&Any]
+  to_block(Self, Double?) -> Block
 }
 
 ///|
 pub(open) trait ToSVG {
   to_svg(Self) -> String
+}
+
+///|
+impl ToSVG for Block with to_svg(self) {
+  let tag = self.tag
+  let attr = self.attr._.to_array().map(fn { (k, v) => "\{k}=\{v}" }).join(" ")
+  if self.content is Some(x) {
+    let tab = "  "
+    let content = x.join("\n\{tab}")
+    "<\{tag} \{attr}>\n\{tab}\{content}\n</\{tag}>"
+  } else {
+    "<\{tag} \{attr} />"
+  }
 }
 
 ///|
@@ -265,7 +266,57 @@ pub impl ToBlock for GradientStop with to_block(self, _) {
   if opacity != "" {
     attrs.push(("stop-opacity", opacity))
   }
-  BasicBlock::{ tag: "stop", attr: @hashmap.from_array(attrs), content: [] }
+  Block::{ tag: "stop", attr: @hashmap.from_array(attrs), content: None }
+}
+
+///|
+pub impl ToBlock for LinearGradient with to_block(self, _) {
+  let attrs = []
+  if self.start is Some(x) {
+    attrs.push(("x1", "\{x.0}%"))
+    attrs.push(("y1", "\{x.1}%"))
+  }
+  if self.end is Some(x) {
+    attrs.push(("x2", "\{x.0}%"))
+    attrs.push(("y2", "\{x.1}%"))
+  }
+  if self.transform is Some(x) {
+    attrs.push_iter(x.to_attr(None).iter())
+  }
+  if self.spread is Some(x) {
+    attrs.push(("spreadMethod", x.to_string()))
+  }
+  let stops = self.stops.map(fn { stop => stop.to_block(None).to_svg() })
+  Block::{
+    tag: "linearGradient",
+    attr: @hashmap.from_array(attrs),
+    content: Some(stops),
+  }
+}
+
+///|
+impl ToBlock for RadialGradient with to_block(self, _) {
+  let attrs = []
+  if self.coordinate is Some(x) {
+    attrs.push(("cx", "\{x.0}%"))
+    attrs.push(("cy", "\{x.1}%"))
+  }
+  if self.start is Some(x) {
+    attrs.push(("fx", "\{x.0}%"))
+    attrs.push(("fy", "\{x.1}%"))
+  }
+  if self.radius is Some(x) {
+    attrs.push(("r", "\{x}%"))
+  }
+  if self.spread is Some(x) {
+    attrs.push(("spreadMethod", x.to_string()))
+  }
+  let stops = self.stops.map(fn { stop => stop.to_block(None).to_svg() })
+  Block::{
+    tag: "radialGradient",
+    attr: @hashmap.from_array(attrs),
+    content: Some(stops),
+  }
 }
 
 ///|
@@ -347,5 +398,53 @@ pub impl ToBlock for PathElement with to_block(self, g) {
   if self.transform is Some(x) {
     attr.push_iter(x.to_attr(g).iter())
   }
-  BasicBlock::{ tag: "path", attr: @hashmap.from_array(attr), content: [] }
+  Block::{ tag: "path", attr: @hashmap.from_array(attr), content: None }
+}
+
+///|
+pub impl ToBlock for ImageElement with to_block(self, _) {
+  let attr = []
+  attr.push(("href", "\"\{self.href}\""))
+  if self.width is Some(x) {
+    attr.push(("width", x.get_pct()))
+  }
+  if self.height is Some(x) {
+    attr.push(("height", x.get_pct()))
+  }
+  Block::{ tag: "image", attr: @hashmap.from_array(attr), content: None }
+}
+
+///|
+pub impl ToBlock for TextElement with to_block(self, g) {
+  let attr = []
+  attr.push(("x", "\{self.position.0.calc(g.unwrap())}%"))
+  attr.push(("y", "\{self.position.1.calc(g.unwrap())}%"))
+  if self.offset is Some(x) {
+    attr.push(("dx", "\{x.0.calc(g.unwrap())}%"))
+    attr.push(("dy", "\{x.1.calc(g.unwrap())}%"))
+  }
+  if self.rotate is Some(x) {
+    attr.push(("rotate", x.map(Double::to_string).join(" ")))
+  }
+  if self.identifier is Some(x) {
+    match x {
+      Id(id) => attr.push(("id", "\"\{id}\""))
+      Class(class) => attr.push(("class", "\"\{class}\""))
+      Both(class, id) => {
+        match class {
+          Class(c) => attr.push(("class", "\"\{c}\""))
+          _ => abort("Invalid class")
+        }
+        match id {
+          Id(i) => attr.push(("id", "\"\{i}\""))
+          _ => abort("Invalid id")
+        }
+      }
+    }
+  }
+  Block::{
+    tag: "text",
+    attr: @hashmap.from_array(attr),
+    content: Some([self.content]),
+  }
 }
