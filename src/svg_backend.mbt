@@ -420,11 +420,11 @@ pub impl ToBlock for ImageElement with to_block(self, _) {
 pub impl ToBlock for TextElement with to_block(self, g) {
   let g_ = g.unwrap()
   let attr = []
-  attr.push(("x", "\{self.position.0.calc(g_)}%"))
-  attr.push(("y", "\{self.position.1.calc(g_)}%"))
+  attr.push(("x", "\{self.position.0.calc(g_)}"))
+  attr.push(("y", "\{self.position.1.calc(g_)}"))
   if self.offset is Some(x) {
-    attr.push(("dx", "\{x.0.calc(g_)}%"))
-    attr.push(("dy", "\{x.1.calc(g_)}%"))
+    attr.push(("dx", "\{x.0.calc(g_)}"))
+    attr.push(("dy", "\{x.1.calc(g_)}"))
   }
   if self.rotate is Some(x) {
     attr.push(("rotate", x.map(Double::to_string).join(" ")))
@@ -524,4 +524,24 @@ impl[S : Shape + ToAttr] ToBlock for ShapeElement[S] with to_block(self, g) {
     attr: @hashmap.from_array(attr),
     content: None,
   }
+}
+
+///|
+impl Element for PathElement with get_type(_) {
+  "path"
+}
+
+///|
+impl Element for ImageElement with get_type(_) {
+  "image"
+}
+
+///|
+impl Element for TextElement with get_type(_) {
+  "text"
+}
+
+///|
+impl Element for Group with get_type(_) {
+  "group"
 }

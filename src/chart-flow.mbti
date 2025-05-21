@@ -3,7 +3,6 @@ package "Luna-Flow/chart-flow"
 import(
   "gmlewis/image/color"
   "moonbitlang/core/hashmap"
-  "moonbitlang/core/immut/list"
 )
 
 // Values
@@ -49,6 +48,13 @@ impl Show for GradientSpreadMethod
 pub(all) type GradientStop (Size, @color.RGBA, Double?)
 impl ToBlock for GradientStop
 
+pub(all) struct Group {
+  elements : Array[&Element]
+  transform : Transform?
+  fill : Fill?
+  stroke : Stroke?
+}
+
 pub(all) enum Identifier {
   Id(String)
   Class(String)
@@ -62,14 +68,6 @@ pub(all) struct ImageElement {
   height : Size?
 }
 impl ToBlock for ImageElement
-
-pub(all) struct Layer {
-  elements : Array[&Element]
-  index : Int
-  name : String
-  visible : Bool
-  opacity : Double
-}
 
 pub(all) struct Line {
   x1 : Size
@@ -112,7 +110,7 @@ impl Paint {
   to_string(Self) -> String
 }
 
-pub(all) type Path @list.T[PathCommand]
+pub(all) type Path Array[PathCommand]
 impl ToAttr for Path
 
 pub(all) enum PathCommand {
@@ -146,11 +144,11 @@ pub(all) struct PathElement {
 impl ToBlock for PathElement
 
 pub(all) struct Polygon {
-  points : @list.T[Position]
+  points : Array[Position]
 }
 
 pub(all) struct Polyline {
-  points : @list.T[Position]
+  points : Array[Position]
 }
 
 pub(all) type Position (Size, Size)
@@ -164,8 +162,14 @@ pub(all) struct RadialGradient {
   spread : GradientSpreadMethod?
 }
 
+pub(all) struct SVGFile {
+  elements : Array[&Element]
+  height : Int
+  width : Int
+  view_box : (Int, Int)?
+}
+
 pub(all) struct ShapeElement[S] {
-  anchor : Position
   shape : S
   fill : Fill?
   stroke : Stroke?
@@ -202,11 +206,12 @@ pub(all) struct TextElement {
   position : Position
   offset : Position?
   rotate : Array[Double]?
+  style : Style?
   identifier : Identifier?
 }
 impl ToBlock for TextElement
 
-pub(all) type Transform @list.T[TransformCommand]
+pub(all) type Transform Array[TransformCommand]
 
 pub(all) enum TransformCommand {
   Matrix(Double, Double, Double, Double, Double, Double)
@@ -221,10 +226,11 @@ pub(all) enum TransformCommand {
 
 // Traits
 pub(open) trait Element {
+  get_type(Self) -> String
 }
 
 pub(open) trait Shape {
-  to_path(Self) -> Path
+  tag(Self) -> String
 }
 
 pub(open) trait ToAttr {

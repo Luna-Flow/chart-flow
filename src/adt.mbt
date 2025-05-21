@@ -143,6 +143,7 @@ pub(all) struct TextElement {
   position : Position
   offset : Position?
   rotate : Array[Double]?
+  style : Style?
   identifier : Identifier?
 }
 
@@ -162,10 +163,17 @@ pub(all) struct ShapeElement[S] {
 }
 
 ///|
-pub(all) struct Layer {
+pub(all) struct Group {
   elements : Array[&Element]
-  index : Int
-  name : String
-  visible : Bool
-  opacity : Double
+  transform : Transform?
+  fill : Fill?
+  stroke : Stroke?
+}
+
+///|
+pub(all) struct SVGFile {
+  elements : Array[&Element]
+  height : Int
+  width : Int
+  view_box : (Int, Int)?
 }
