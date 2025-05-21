@@ -22,11 +22,13 @@ pub(all) struct Line {
 }
 
 ///|
+/// need calc size while converting to path & svg
 pub(all) struct Polygon {
-  points : List[Position]
+  points : Array[Position]
 }
 
 ///|
+/// need calc size while converting to path & svg
 pub(all) struct Polyline {
-  points : List[Position]
+  points : Array[Position]
 }
