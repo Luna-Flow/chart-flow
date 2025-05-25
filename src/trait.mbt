@@ -1,7 +1,14 @@
 ///|
-pub(open) trait Element {}
+pub(open) trait Element: ToBlock {
+  get_type(Self) -> String
+}
 
 ///|
 pub(open) trait Shape {
-  to_path(Self) -> Path
+  tag(Self) -> String
+}
+
+///|
+pub(open) trait Def {
+  def_type(Self) -> String
 }

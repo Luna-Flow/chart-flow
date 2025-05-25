@@ -6,44 +6,7 @@ struct Size {
 } derive(Eq)
 
 ///|
-pub fn Size::same_parent(self : Size, other : Size) -> Bool {
-  if self.parent == other.parent {
-    true
-  } else {
-    false
-  }
-}
-
-///|
-fn Size::calc(self : Size, global : Double) -> Double {
-  if self.parent is None {
-    if self.pct == 0.0 {
-      self.num
-    } else {
-      self.num + self.pct * global / 100.0 
-    }
-  } else if self.pct == 0.0 {
-    self.num + self.parent.unwrap().calc(global)
-  } else {
-    self.num + self.pct * self.parent.unwrap().calc(global) / 100.0
-  }
-}
-
-///|
-pub impl Add for Size with op_add(self, other) {
-  if self.same_parent(other) {
-    Size::{
-      num: self.num + other.num,
-      pct: self.pct + other.pct,
-      parent: self.parent,
-    }
-  } else {
-    abort("Cannot add sizes with different parents")
-  }
-}
-
-///|
-type Position (Size, Size)
+pub(all) type Position (Size, Size)
 
 ///|
 pub(all) enum PathCommand {
@@ -87,23 +50,17 @@ pub(all) enum PathCommand {
 }
 
 ///|
-pub(all) enum GradientType {
-  Linear
-  Radial
-}
-
-///|
-pub(all) type GradientStop (&Color, Double)
 
 ///|
 pub(all) enum Paint {
+  // Solid(color)
   Solid(RGBA)
-  //Gradient(GradientType, start_color, start, end_color, end, gradient_stops)
-  Gradient(GradientType, RGBA, Position, RGBA, Position, Array[GradientStop])
+  // Gradient(id)
+  Gradient(String)
 }
 
 ///|
-pub(all) type Path List[PathCommand]
+pub(all) type Path Array[PathCommand]
 
 ///|
 pub(all) enum LineCap {
@@ -114,25 +71,23 @@ pub(all) enum LineCap {
 
 ///|
 pub(all) enum LineJoin {
-  Miter
-  Round
+  Arcs
   Bevel
-}
-
-///|
-pub(all) struct DashPattern {
-  length : Double
-  gap : Double
+  Miter
+  MiterClip
+  Round
 }
 
 ///|
 pub(all) struct Stroke {
-  width : Double
   color : Paint
-  line_cap : LineCap
-  line_join : LineJoin
-  miter_limit : Double
-  dash_pattern : Array[DashPattern]
+  dash_array : Array[Double]
+  dash_offset : Double?
+  line_cap : LineCap?
+  line_join : LineJoin?
+  miter_limit : Double?
+  opacity : Double?
+  width : Double?
 }
 
 ///|
@@ -145,12 +100,11 @@ pub(all) enum FillRule {
 pub(all) struct Fill {
   color : Paint
   opacity : Double?
-  rule : FillRule
+  rule : FillRule?
 }
 
 ///|
-pub(all) enum Transform {
-  Combine(Transform, Transform)
+pub(all) enum TransformCommand {
   Matrix(Double, Double, Double, Double, Double, Double)
   Translate(Position)
   Scale(Double, Double)
@@ -160,8 +114,10 @@ pub(all) enum Transform {
 }
 
 ///|
+pub(all) type Transform Array[TransformCommand]
+
+///|
 pub(all) struct PathElement {
-  anchor : Position
   path : Path
   fill : Fill?
   stroke : Stroke?
@@ -169,46 +125,56 @@ pub(all) struct PathElement {
 }
 
 ///|
-pub(all) struct TextElement {
-  content : String
-  position : Position
-  font_family : String
-  font_size : Double
-  text_anchor : TextAnchor
-  fill : Fill?
-  stroke : Stroke?
-  transform : Transform?
+pub(all) enum Identifier {
+  Id(String)
+  Class(String)
+  Both(Identifier, Identifier)
 }
 
 ///|
-pub(all) enum TextAnchor {
-  Start
-  Middle
-  End
+pub(all) struct Style {
+  identifier : Identifier
+  attr : HashMap[String, String]
+}
+
+///|
+pub(all) struct TextElement {
+  content : String
+  position : Position
+  offset : Position?
+  rotate : Array[Double]?
+  style : Style?
+  identifier : Identifier?
 }
 
 ///|
 pub(all) struct ImageElement {
   href : String
-  width : Double
-  height : Double
   position : Position
-  transform : Transform?
+  width : Size?
+  height : Size?
 }
 
 ///|
 pub(all) struct ShapeElement[S] {
-  anchor : Position
   shape : S
   fill : Fill?
   stroke : Stroke?
 }
 
 ///|
-pub(all) struct Layer {
+pub(all) struct Group {
   elements : Array[&Element]
-  index : Int
-  name : String
-  visible : Bool
-  opacity : Double
+  transform : Transform?
+  fill : Fill?
+  stroke : Stroke?
+}
+
+///|
+pub(all) struct Img {
+  elements : Array[&Element]
+  defs : Array[&Def]
+  height : Int?
+  width : Int?
+  view_box : (Int, Int, Int, Int)?
 }

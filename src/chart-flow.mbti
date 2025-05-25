@@ -2,69 +2,86 @@ package "Luna-Flow/chart-flow"
 
 import(
   "gmlewis/image/color"
-  "moonbitlang/core/list"
+  "moonbitlang/core/hashmap"
 )
 
 // Values
 
 // Types and methods
-pub(all) struct Circle[T] {
-  center_x : T
-  center_y : T
-  radius : T
+type Block
+
+type BlockAttr
+
+pub(all) struct Circle {
+  center_x : Size
+  center_y : Size
+  radius : Size
 }
 
-pub(all) struct DashPattern {
-  length : Double
-  gap : Double
-}
-
-pub(all) struct Ellipse[T] {
-  center_x : T
-  center_y : T
-  radius_x : T
-  radius_y : T
+pub(all) struct Ellipse {
+  center_x : Size
+  center_y : Size
+  radius_x : Size
+  radius_y : Size
 }
 
 pub(all) struct Fill {
   color : Paint
   opacity : Double?
-  rule : FillRule
+  rule : FillRule?
 }
+impl ToAttr for Fill
 
 pub(all) enum FillRule {
   NonZero
   EvenOdd
 }
+impl Show for FillRule
 
-pub(all) type GradientStop (&@color.Color, Double)
+pub(all) enum GradientSpreadMethod {
+  Pad
+  Reflect
+  Repeat
+}
+impl Show for GradientSpreadMethod
 
-pub(all) enum GradientType {
-  Linear
-  Radial
+pub(all) type GradientStop (Size, @color.RGBA, Double?)
+impl ToBlock for GradientStop
+
+pub(all) struct Group {
+  elements : Array[&Element]
+  transform : Transform?
+  fill : Fill?
+  stroke : Stroke?
+}
+
+pub(all) enum Identifier {
+  Id(String)
+  Class(String)
+  Both(Identifier, Identifier)
 }
 
 pub(all) struct ImageElement {
   href : String
-  width : Double
-  height : Double
   position : Position
-  transform : Transform?
+  width : Size?
+  height : Size?
 }
+impl ToBlock for ImageElement
 
-pub(all) struct Layer {
+pub(all) struct Img {
   elements : Array[&Element]
-  index : Int
-  name : String
-  visible : Bool
-  opacity : Double
+  defs : Array[&Def]
+  height : Int?
+  width : Int?
+  view_box : (Int, Int, Int, Int)?
 }
 
-pub(all) struct Line[T] {
-  x1 : T
-  y1 : T
-  x2 : T
-  y2 : T
+pub(all) struct Line {
+  x1 : Size
+  y1 : Size
+  x2 : Size
+  y2 : Size
 }
 
 pub(all) enum LineCap {
@@ -72,105 +89,134 @@ pub(all) enum LineCap {
   Round
   Square
 }
+impl Show for LineCap
 
 pub(all) enum LineJoin {
-  Miter
-  Round
+  Arcs
   Bevel
+  Miter
+  MiterClip
+  Round
 }
+impl Show for LineJoin
 
-pub(all) enum Number {
-  Number(Double)
+pub(all) struct LinearGradient {
+  id : String
+  start : (Double, Double)?
+  end : (Double, Double)?
+  transform : Transform?
+  stops : Array[GradientStop]
+  spread : GradientSpreadMethod?
 }
+impl ToBlock for LinearGradient
 
 pub(all) enum Paint {
   Solid(@color.RGBA)
-  Gradient(GradientType, @color.RGBA, Position, @color.RGBA, Position, Array[GradientStop])
+  Gradient(String)
+}
+impl Paint {
+  to_string(Self) -> String
 }
 
-pub(all) type Path @list.T[PathCommand]
+pub(all) type Path Array[PathCommand]
+impl ToAttr for Path
 
 pub(all) enum PathCommand {
   Move(Position)
   MoveTo(Position)
   Line(Position)
   LineTo(Position)
-  Horizontal(Double)
-  HorizontalTo(Position)
-  Vertical(Double)
-  VerticalTo(Position)
+  Horizontal(Size)
+  HorizontalTo(Size)
+  Vertical(Size)
+  VerticalTo(Size)
   Quadratic(Position, Position)
   QuadraticTo(Position, Position)
   SmoothQuadratic(Position)
   SmoothQuadraticTo(Position)
   Cubic(Position, Position, Position)
   CubicTo(Position, Position, Position)
-  SmoothCubic(Position)
-  SmoothCubicTo(Position)
-  Arc(Double, Double, Double, Bool, Bool, Position)
-  ArcTo(Double, Double, Double, Bool, Bool, Position)
+  SmoothCubic(Position, Position)
+  SmoothCubicTo(Position, Position)
+  Arc(Position, Double, Bool, Bool, Position)
+  ArcTo(Position, Double, Bool, Bool, Position)
   Close
 }
 
 pub(all) struct PathElement {
-  anchor : Position
   path : Path
   fill : Fill?
   stroke : Stroke?
   transform : Transform?
 }
-
-pub(all) enum Percent {
-  Percent(Double)
-}
+impl ToBlock for PathElement
 
 pub(all) struct Polygon {
-  points : @list.T[Position]
+  points : Array[Position]
 }
 
 pub(all) struct Polyline {
-  points : @list.T[Position]
+  points : Array[Position]
 }
 
-pub(all) type Position (Double, Double)
+pub(all) type Position (Size, Size)
+
+pub(all) struct RadialGradient {
+  id : String
+  coordinate : (Double, Double)?
+  start : (Double, Double)?
+  radius : Double?
+  stops : Array[GradientStop]
+  spread : GradientSpreadMethod?
+}
 
 pub(all) struct ShapeElement[S] {
-  anchor : Position
   shape : S
   fill : Fill?
   stroke : Stroke?
 }
 
-pub(all) struct Stroke {
-  width : Double
-  color : Paint
-  line_cap : LineCap
-  line_join : LineJoin
-  miter_limit : Double
-  dash_pattern : Array[DashPattern]
+type Size
+impl Size {
+  calc(Self, Double) -> Double
+  calc_keep_pct(Self) -> Self
+  same_parent(Self, Self) -> Bool
 }
+impl Add for Size
+impl Eq for Size
 
-pub(all) enum TextAnchor {
-  Start
-  Middle
-  End
+pub(all) struct Stroke {
+  color : Paint
+  dash_array : Array[Double]
+  dash_offset : Double?
+  line_cap : LineCap?
+  line_join : LineJoin?
+  miter_limit : Double?
+  opacity : Double?
+  width : Double?
+}
+impl ToAttr for Stroke
+
+pub(all) struct Style {
+  identifier : Identifier
+  attr : @hashmap.T[String, String]
 }
 
 pub(all) struct TextElement {
   content : String
   position : Position
-  font_family : String
-  font_size : Double
-  text_anchor : TextAnchor
-  fill : Fill?
-  stroke : Stroke?
-  transform : Transform?
+  offset : Position?
+  rotate : Array[Double]?
+  style : Style?
+  identifier : Identifier?
 }
+impl ToBlock for TextElement
 
-pub(all) enum Transform {
-  Combine(Transform, Transform)
+pub(all) type Transform Array[TransformCommand]
+
+pub(all) enum TransformCommand {
   Matrix(Double, Double, Double, Double, Double, Double)
-  Translate(Double, Double)
+  Translate(Position)
   Scale(Double, Double)
   Rotate(Double, Position?)
   SkewX(Double)
@@ -180,12 +226,32 @@ pub(all) enum Transform {
 // Type aliases
 
 // Traits
-pub(open) trait Element {
+pub(open) trait Def {
+  def_type(Self) -> String
 }
 
-pub(open) trait NumberType {
+pub(open) trait Element : ToBlock {
+  get_type(Self) -> String
 }
 
 pub(open) trait Shape {
+  tag(Self) -> String
+}
+
+pub(open) trait ToAttr {
+  to_attr(Self, Double?) -> Array[(String, String)]
+}
+
+pub(open) trait ToBlock {
+  to_block(Self, Double?) -> Block
+}
+
+pub(open) trait ToHex {
+  to_hex(Self) -> String
+}
+impl ToHex for Byte
+
+pub(open) trait ToSVG {
+  to_svg(Self) -> String
 }
 
