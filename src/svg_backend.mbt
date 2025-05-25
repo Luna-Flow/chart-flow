@@ -472,6 +472,23 @@ impl ToAttr for Ellipse with to_attr(self, g) {
 }
 
 ///|
+impl ToAttr for Rect with to_attr(self, g) {
+  let g_ = g.unwrap()
+  let x = self.x.calc(g_)
+  let y = self.y.calc(g_)
+  let width = self.width.calc(g_)
+  let height = self.height.calc(g_)
+  let rx = self.rx.map_or("", fn { r => ", \{r.calc(g_)}" })
+  let ry = self.ry.map_or("", fn { r => ", \{r.calc(g_)}" })
+  [
+    ("x", "\{x}"),
+    ("y", "\{y}"),
+    ("width", "\{width}"),
+    ("height", "\{height}\{rx}\{ry}"),
+  ]
+}
+
+///|
 impl ToAttr for Line with to_attr(self, g) {
   let g_ = g.unwrap()
   let x1 = self.x1.calc(g_)
@@ -546,6 +563,9 @@ impl Element for Group with get_type(_) {
   "group"
 }
 
+impl[S: Shape + ToAttr] Element for ShapeElement[S] with get_type(_) {
+  "shape"
+} 
 ///|
 impl ToBlock for Group with to_block(self, g) {
   let attr = []
@@ -580,7 +600,63 @@ impl ToBlock for Img with to_block(self, g) {
   Block::{ tag: "svg", attr: @hashmap.from_array(attr), content: Some(content) }
 }
 
+///|
 impl ToSVG for Img with to_svg(self) {
   let block = self.to_block(None)
   block.to_svg()
+}
+
+///|
+test "svg_img" {
+  fn mk_size_num(num : Double) -> Size {
+    Size::{ num, pct: 0.0, parent: None }
+  }
+
+  fn mk_size_pct(pct : Double) -> Size {
+    Size::{ num: 0.0, pct, parent: None }
+  }
+
+  fn mk_size_both(num : Double, pct : Double) -> Size {
+    Size::{ num, pct, parent: None }
+  }
+
+  let red = Fill::{
+    color: Solid(RGBA::{ r: 255, g: 0, b: 0, a: 255 }),
+    opacity: None,
+    rule: None,
+  }
+  let green = Fill::{
+    color: Solid(RGBA::{ r: 0, g: 255, b: 0, a: 255 }),
+    opacity: None,
+    rule: None,
+  }
+  let rect = ShapeElement::{
+    shape: Rect::{
+      x: mk_size_num(0),
+      y: mk_size_num(0),
+      width: mk_size_pct(100),
+      height: mk_size_pct(100),
+      rx: None,
+      ry: None,
+    },
+    fill: Some(red),
+    stroke: None,
+  }
+  let circle = ShapeElement::{
+    shape: Circle::{
+      center_x: mk_size_num(150),
+      center_y: mk_size_num(100),
+      radius: mk_size_pct(80),
+    },
+    fill: Some(green),
+    stroke: None,
+  }
+  let img = Img::{
+    elements: [rect, circle],
+    defs: [],
+    height: Some(200),
+    width: Some(300),
+    view_box: Some((0, 0, 300, 200)),
+  }
+  println(img.to_svg())
 }

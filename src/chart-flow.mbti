@@ -69,6 +69,14 @@ pub(all) struct ImageElement {
 }
 impl ToBlock for ImageElement
 
+pub(all) struct Img {
+  elements : Array[&Element]
+  defs : Array[&Def]
+  height : Int?
+  width : Int?
+  view_box : (Int, Int, Int, Int)?
+}
+
 pub(all) struct Line {
   x1 : Size
   y1 : Size
@@ -162,13 +170,6 @@ pub(all) struct RadialGradient {
   spread : GradientSpreadMethod?
 }
 
-pub(all) struct SVGFile {
-  elements : Array[&Element]
-  height : Int
-  width : Int
-  view_box : (Int, Int)?
-}
-
 pub(all) struct ShapeElement[S] {
   shape : S
   fill : Fill?
@@ -225,7 +226,11 @@ pub(all) enum TransformCommand {
 // Type aliases
 
 // Traits
-pub(open) trait Element {
+pub(open) trait Def {
+  def_type(Self) -> String
+}
+
+pub(open) trait Element : ToBlock {
   get_type(Self) -> String
 }
 
