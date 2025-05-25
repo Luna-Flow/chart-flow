@@ -96,7 +96,7 @@ fn to_zero_one(b : Bool) -> String {
 }
 
 ///|
-fn pmap[T](self : Position, f : (Size) -> T) -> (T, T) {
+fn[T] pmap(self : Position, f : (Size) -> T) -> (T, T) {
   (f(self.0), f(self.1))
 }
 
@@ -328,12 +328,12 @@ pub fn Paint::to_string(self : Paint) -> String {
 }
 
 ///|
-fn attr[T : Show](x : String) -> (String) -> (T) -> (String, String) {
+fn[T : Show] attr(x : String) -> (String) -> (T) -> (String, String) {
   fn { y => fn { z => ("\{x}-\{y}", "\"\{z}\"") } }
 }
 
 ///|
-fn attr_stk[T : Show](x : String) -> (T) -> (String, String) {
+fn[T : Show] attr_stk(x : String) -> (T) -> (String, String) {
   attr("stroke")(x)
 }
 
@@ -368,7 +368,7 @@ pub impl ToAttr for Stroke with to_attr(self, _) {
 }
 
 ///|
-fn attr_fill[T : Show](x : String) -> (T) -> (String, String) {
+fn[T : Show] attr_fill(x : String) -> (T) -> (String, String) {
   attr("fill")(x)
 }
 
@@ -544,4 +544,43 @@ impl Element for TextElement with get_type(_) {
 ///|
 impl Element for Group with get_type(_) {
   "group"
+}
+
+///|
+impl ToBlock for Group with to_block(self, g) {
+  let attr = []
+  if self.transform is Some(x) {
+    attr.push_iter(x.to_attr(g).iter())
+  }
+  if self.fill is Some(x) {
+    attr.push_iter(x.to_attr(g).iter())
+  }
+  if self.stroke is Some(x) {
+    attr.push_iter(x.to_attr(g).iter())
+  }
+  let content = self.elements.map(fn { e => e.to_block(g).to_svg() })
+  Block::{ tag: "g", attr: @hashmap.from_array(attr), content: Some(content) }
+}
+
+///|
+impl ToBlock for Img with to_block(self, g) {
+  let attr = []
+  attr.push(("xmlns", "\"http://www.w3.org/2000/svg\""))
+  if self.width is Some(x) {
+    attr.push(("width", x.to_string()))
+  }
+  if self.height is Some(x) {
+    attr.push(("height", x.to_string()))
+  }
+  if self.view_box is Some(x) {
+    let (x1, y1, x2, y2) = x
+    attr.push(("viewBox", "\"\{x1} \{y1} \{x2} \{y2}\""))
+  }
+  let content = self.elements.map(fn { e => e.to_block(g).to_svg() })
+  Block::{ tag: "svg", attr: @hashmap.from_array(attr), content: Some(content) }
+}
+
+impl ToSVG for Img with to_svg(self) {
+  let block = self.to_block(None)
+  block.to_svg()
 }

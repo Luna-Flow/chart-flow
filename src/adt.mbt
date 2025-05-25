@@ -171,9 +171,10 @@ pub(all) struct Group {
 }
 
 ///|
-pub(all) struct SVGFile {
+pub(all) struct Img {
   elements : Array[&Element]
-  height : Int
-  width : Int
-  view_box : (Int, Int)?
+  defs : Array[&Def]
+  height : Int?
+  width : Int?
+  view_box : (Int, Int, Int, Int)?
 }
